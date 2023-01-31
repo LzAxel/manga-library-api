@@ -40,7 +40,7 @@ func (s *AuthorizationService) SignUp(ctx context.Context, userDTO domain.Create
 		return err
 	}
 
-	id := uuid.New().String()
+	id := uuid.NewString()
 
 	user = domain.User{
 		Id:           id,

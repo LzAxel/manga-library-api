@@ -24,7 +24,7 @@ func NewMangaService(storage storage.Manga, logger logger.Logger) *MangaService 
 
 func (s *MangaService) Create(ctx context.Context, userId string, mangaDTO domain.CreateMangaDTO) (string, error) {
 	manga := domain.Manga{
-		Id:                uuid.New().String(),
+		Id:                uuid.NewString(),
 		Title:             mangaDTO.Title,
 		AlternativeTitles: mangaDTO.AlternativeTitles,
 		Slug:              slug.Make(mangaDTO.Title),

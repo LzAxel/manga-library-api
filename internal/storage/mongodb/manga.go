@@ -7,7 +7,6 @@ import (
 	"manga-library/internal/domain"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -83,9 +82,8 @@ func (m *MangaMongoDB) GetBySlug(ctx context.Context, mangaSlug string) (domain.
 func (m *MangaMongoDB) Delete(ctx context.Context, mangaId string) error {
 
 	coll := m.db.Collection(mangaCollection)
-	objId, _ := primitive.ObjectIDFromHex(mangaId)
 
-	if _, err := coll.DeleteOne(ctx, bson.M{"_id": objId}); err != nil {
+	if _, err := coll.DeleteOne(ctx, bson.M{"_id": mangaId}); err != nil {
 		return err
 	}
 

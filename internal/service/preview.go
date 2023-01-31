@@ -33,12 +33,12 @@ func NewPreviewService(storage storage.Preview, logger logger.Logger) *PreviewSe
 }
 
 func (s *PreviewService) Create(ctx context.Context, file multipart.File, filename, uploaderId string) (string, error) {
-	id := uuid.New()
+	id := uuid.NewString()
 
-	filename = id.String() + filepath.Ext(filename)
+	filename = id + filepath.Ext(filename)
 
 	preview := domain.Preview{
-		Id:         id.String(),
+		Id:         id,
 		FileName:   filename,
 		UploaderId: uploaderId,
 		URL:        previewUrlBase + filename,
