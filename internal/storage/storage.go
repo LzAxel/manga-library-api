@@ -50,6 +50,7 @@ func NewInMemoryStorage(logger logger.Logger) *Storage {
 	return &Storage{
 		logger:        logger,
 		Manga:         memory.NewMangaMemory(logger),
+		Preview:       memory.NewPreviewMemory(logger),
 		Authorization: memory.NewAuthMemory(logger),
 	}
 }
