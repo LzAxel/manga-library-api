@@ -1,0 +1,4 @@
+main
+_*
+configs/*
+!configs/local.yaml

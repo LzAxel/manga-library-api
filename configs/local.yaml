@@ -1,0 +1,17 @@
+isDebug: true
+isProd: false
+JWT:
+  secret: secretjwt
+  tokenTTL: 24
+Listen:
+  bindIP: 0.0.0.0
+  port: 8080
+App:
+  logLevel: info
+  AdminUser:
+    login: admin
+    password: admin
+DB:
+  host: 0.0.0.0
+  port: 27017
+  name: mangaLibrary
