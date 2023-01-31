@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"image"
 	"manga-library/internal/domain"
 	"manga-library/internal/storage"
@@ -9,6 +10,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"image/jpeg"
@@ -21,6 +23,7 @@ import (
 const (
 	previewUploadDir = `.\upload\preview\`
 	previewUrlBase   = `preview/`
+	previewFormats   = "png jpeg jpg"
 )
 
 type PreviewService struct {
@@ -36,6 +39,10 @@ func (s *PreviewService) Create(ctx context.Context, file multipart.File, filena
 	id := uuid.NewString()
 
 	filename = id + filepath.Ext(filename)
+
+	if !strings.Contains(previewFormats, filepath.Ext(filename)) {
+		return "", errors.New("invalid file extension")
+	}
 
 	preview := domain.Preview{
 		Id:         id,
