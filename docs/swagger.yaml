@@ -1,5 +1,111 @@
+basePath: /
+definitions:
+  domain.CreateMangaDTO:
+    properties:
+      ageRating:
+        type: integer
+      alternativeTitles:
+        items:
+          type: string
+        type: array
+      description:
+        type: string
+      previewUrl:
+        type: string
+      releaseYear:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - ageRating
+    - description
+    - previewUrl
+    - releaseYear
+    - tags
+    - title
+    type: object
+  domain.CreateUserDTO:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  domain.LoginUserDTO:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  domain.Manga:
+    properties:
+      _id:
+        type: string
+      ageRating:
+        type: integer
+      alternativeTitles:
+        items:
+          type: string
+        type: array
+      createdAt:
+        type: string
+      description:
+        type: string
+      likeCount:
+        type: integer
+      previewUrl:
+        type: string
+      releaseYear:
+        type: integer
+      slug:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      uploaderId:
+        type: string
+    type: object
+  domain.UpdateMangaDTO:
+    properties:
+      ageRating:
+        type: integer
+      alternativeTitles:
+        items:
+          type: string
+        type: array
+      description:
+        type: string
+      previewUrl:
+        type: string
+      releaseYear:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
+host: localhost:8080
 info:
   contact: {}
+  description: API Server for Manga Library App
+  title: Manga Library API
+  version: "1.0"
 paths:
   /api/heartbeat:
     get:
@@ -11,4 +117,167 @@ paths:
       summary: Heartbeat metric
       tags:
       - Metrics
+  /api/manga:
+    get:
+      parameters:
+      - description: Manga ID
+        in: query
+        name: id
+        type: string
+      - description: Manga slug
+        in: query
+        name: slug
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Manga'
+        "400":
+          description: Invalid input (One of params is required)
+        "404":
+          description: Manga not found
+        "500":
+          description: Internal Server Error
+      summary: Get Manga by ID or Slug
+      tags:
+      - Manga
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Add manga
+        in: body
+        name: manga
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateMangaDTO'
+      responses:
+        "200":
+          description: Created manga ID
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Create Manga
+      tags:
+      - Manga
+  /api/manga/{id}:
+    delete:
+      parameters:
+      - description: Manga ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Delete Manga by ID
+      tags:
+      - Manga
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Update manga
+        in: body
+        name: manga
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateMangaDTO'
+      - description: Manga ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Update Manga by ID
+      tags:
+      - Manga
+  /api/manga/latest:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Manga'
+            type: array
+        "500":
+          description: Internal Server Error
+      summary: Get Latest Manga
+      tags:
+      - Manga
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Sign in via username and password
+      parameters:
+      - description: Auth Sign In Input
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginUserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+        "500":
+          description: Internal Server Error
+      summary: Sign In
+      tags:
+      - Authorization
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Sign up via username and password
+      parameters:
+      - description: Auth Sign Up Input
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateUserDTO'
+      responses:
+        "201":
+          description: Created
+        "409":
+          description: Username is already exists
+        "500":
+          description: Internal Server Error
+      summary: Sign up
+      tags:
+      - Authorization
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

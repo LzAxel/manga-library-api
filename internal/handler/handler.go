@@ -21,8 +21,6 @@ func NewHandler(service *service.Service, logger logger.Logger) *Handler {
 	return &Handler{services: service, logger: logger}
 }
 
-// TODO: documentate every handler
-
 func (h *Handler) InitRoutes() *gin.Engine {
 	h.logger.Infoln("routes initializated")
 	router := gin.New()
