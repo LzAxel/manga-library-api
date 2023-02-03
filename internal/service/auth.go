@@ -4,7 +4,6 @@ import (
 	"context"
 	"manga-library/internal/domain"
 	"manga-library/internal/storage"
-	"manga-library/pkg/errors"
 	"manga-library/pkg/hash"
 	"manga-library/pkg/jwt"
 	"manga-library/pkg/logger"
@@ -22,13 +21,15 @@ type AuthorizationService struct {
 	storage    storage.Authorization
 	logger     logger.Logger
 	jwtManager *jwt.JWTManager
+	adminUser  domain.AdminUser
 }
 
-func NewAuthorizationService(storage storage.Authorization, logger logger.Logger, jwtManager *jwt.JWTManager) *AuthorizationService {
+func NewAuthorizationService(storage storage.Authorization, logger logger.Logger, jwtManager *jwt.JWTManager, adminUser domain.AdminUser) *AuthorizationService {
 	return &AuthorizationService{
 		storage:    storage,
 		logger:     logger,
 		jwtManager: jwtManager,
+		adminUser:  adminUser,
 	}
 }
 
@@ -57,13 +58,20 @@ func (s *AuthorizationService) SignUp(ctx context.Context, userDTO domain.Create
 
 func (s *AuthorizationService) SignIn(ctx context.Context, userDTO domain.LoginUserDTO) (string, error) {
 
+	if userDTO == domain.LoginUserDTO(s.adminUser) {
+		// TODO fix admin id
+		token := s.jwtManager.NewJWT("admin-user-id")
+
+		return token, nil
+	}
+
 	password, userId, err := s.storage.SignIn(ctx, userDTO.Username)
 	if err != nil {
 		return "", err
 	}
 
 	if err := hash.ComparePassword(password, userDTO.Password+hashSalt); err != nil {
-		return "", errors.ErrWrongPassword
+		return "", domain.ErrWrongAuthCreditionals
 	}
 
 	token := s.jwtManager.NewJWT(userId)
