@@ -3,7 +3,6 @@ package mongodb
 import (
 	"context"
 	"manga-library/internal/domain"
-	"manga-library/pkg/errors"
 	"manga-library/pkg/logger"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -32,7 +31,7 @@ func (s *AuthorizationMongoDB) SignUp(ctx context.Context, user domain.User) err
 	result, err := coll.InsertOne(ctx, user)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
-			return errors.ErrUsernameExists
+			return domain.ErrUsernameExists
 		}
 		return err
 	}

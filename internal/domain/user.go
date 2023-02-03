@@ -6,9 +6,11 @@ import (
 )
 
 var (
-	ErrNotFound    = errors.New("not found")
-	ErrFailedToGet = errors.New("failed to get")
-	ErrNotTheOwner = errors.New("not the owner of note")
+	ErrNotFound   = errors.New("not found")
+	ErrNotAnOwner = errors.New("not an owner of manga")
+
+	ErrWrongAuthCreditionals = errors.New("wrong password or username")
+	ErrUsernameExists        = errors.New("username already exists")
 )
 
 type User struct {
@@ -17,6 +19,11 @@ type User struct {
 	PasswordHash string    `json:"passwordHash" bson:"passwordHash"`
 	IsEditor     bool      `json:"isEditor" bson:"isEditor"`
 	CreatedAt    time.Time `json:"createdAt" bson:"createdAt"`
+}
+
+type AdminUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type CreateUserDTO struct {

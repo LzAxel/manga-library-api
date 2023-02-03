@@ -2,7 +2,6 @@ package memory
 
 import (
 	"context"
-	"errors"
 	"manga-library/internal/domain"
 	"manga-library/pkg/logger"
 	"sort"
@@ -30,8 +29,7 @@ func (m *MangaMemory) Create(ctx context.Context, manga domain.Manga) (string, e
 
 	for _, m := range storedManga {
 		if m.Slug == manga.Slug {
-			// TODO: make unified exists error
-			return "", errors.New("manga slug conflict")
+			return "", domain.ErrMangaTitleExists
 		}
 	}
 
@@ -68,7 +66,6 @@ func (m *MangaMemory) GetById(ctx context.Context, mangaId string) (domain.Manga
 
 	loadedManga, ok := m.m.Load(mangaId)
 	manga = loadedManga.(domain.Manga)
-
 	if !ok {
 		return manga, domain.ErrNotFound
 	}
@@ -87,6 +84,9 @@ func (m *MangaMemory) GetBySlug(ctx context.Context, mangaSlug string) (domain.M
 
 		return true
 	})
+	if manga.Title == "" {
+		return manga, domain.ErrNotFound
+	}
 
 	return manga, nil
 }

@@ -1,6 +1,14 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var (
+	ErrMangaTitleExists = errors.New("manga title already exists")
+	ErrFailedToGet      = errors.New("failed to get manga")
+)
 
 type Manga struct {
 	Id                string    `json:"_id" bson:"_id"`
@@ -28,7 +36,7 @@ type CreateMangaDTO struct {
 }
 
 type UpdateMangaDTO struct {
-	Id                string    `bson:"_id"`
+	Id                string    `json:"-" bson:"_id"`
 	Title             *string   `json:"title"`
 	AlternativeTitles *[]string `json:"alternativeTitles"`
 	Description       *string   `json:"description"`
@@ -36,7 +44,7 @@ type UpdateMangaDTO struct {
 	PreviewURL        *string   `json:"previewUrl"`
 	AgeRating         *int      `json:"ageRating"`
 	ReleaseYear       *int      `json:"releaseYear"`
-	Slug              string
+	Slug              string    `json:"-"`
 }
 
 type GetMangaDTO struct {
