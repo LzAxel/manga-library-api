@@ -78,6 +78,7 @@ func (h *Handler) getLatestManga(c *gin.Context) {
 // @Router /api/manga [get]
 func (h *Handler) getManga(c *gin.Context) {
 	var manga domain.Manga
+	var err error
 
 	slug := c.Query("slug")
 	id := c.Query("id")
@@ -93,12 +94,11 @@ func (h *Handler) getManga(c *gin.Context) {
 		return
 	}
 
-	getMangaDTO := domain.GetMangaDTO{
-		Id:   id,
-		Slug: slug,
+	if slug != "" {
+		manga, err = h.services.Manga.GetBySlug(c, slug)
+	} else {
+		manga, err = h.services.Manga.GetByID(c, id)
 	}
-
-	manga, err := h.services.Manga.Get(c, getMangaDTO)
 
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {

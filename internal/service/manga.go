@@ -45,14 +45,12 @@ func (s *MangaService) GetLatest(ctx context.Context) ([]domain.Manga, error) {
 	return s.storage.GetLatest(ctx)
 }
 
-func (s *MangaService) Get(ctx context.Context, options domain.GetMangaDTO) (domain.Manga, error) {
-	if options.Id != "" {
-		return s.storage.GetById(ctx, options.Id)
+func (s *MangaService) GetByID(ctx context.Context, id string) (domain.Manga, error) {
+	return s.storage.GetById(ctx, id)
+}
 
-	} else {
-		return s.storage.GetBySlug(ctx, options.Slug)
-	}
-
+func (s *MangaService) GetBySlug(ctx context.Context, slug string) (domain.Manga, error) {
+	return s.storage.GetBySlug(ctx, slug)
 }
 
 func (s *MangaService) Delete(ctx context.Context, userId string, mangaId string) error {

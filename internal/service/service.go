@@ -13,7 +13,8 @@ type Manga interface {
 	Create(ctx context.Context, userId string, mangaDTO domain.CreateMangaDTO) (string, error)
 	GetLatest(ctx context.Context) ([]domain.Manga, error)
 
-	Get(ctx context.Context, options domain.GetMangaDTO) (domain.Manga, error)
+	GetByID(ctx context.Context, id string) (domain.Manga, error)
+	GetBySlug(ctx context.Context, slug string) (domain.Manga, error)
 	Delete(ctx context.Context, userId string, mangaId string) error
 	Update(ctx context.Context, userId string, mangaDTO domain.UpdateMangaDTO) error
 }
