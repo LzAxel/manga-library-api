@@ -1,7 +1,10 @@
 .SILENT:
 
+download:
+	go mod download
+
 build:
-	go mod download && go build -o ./cmd/app/main ./cmd/app/main.go
+	go build -o ./cmd/app/main ./cmd/app/main.go
 
 run: build
 	./cmd/app/main
