@@ -24,6 +24,11 @@ type Preview interface {
 	Delete(ctx context.Context, previewId string) error
 }
 
+type User interface {
+	GetByID(ctx context.Context, userID string) (domain.User, error)
+	GetByUsername(ctx context.Context, username string) (domain.User, error)
+}
+
 type Authorization interface {
 	SignUp(ctx context.Context, user domain.User) error
 	SignIn(ctx context.Context, username string) (password, userId string, err error)
@@ -33,6 +38,7 @@ type Storage struct {
 	Manga
 	Preview
 	Authorization
+	User
 
 	logger logger.Logger
 }
@@ -43,6 +49,7 @@ func NewStorage(db *mongo.Database, logger logger.Logger) *Storage {
 		Manga:         mongodb.NewMangaMongoDB(db),
 		Preview:       mongodb.NewPreviewMongoDB(db),
 		Authorization: mongodb.NewAuthorizationMongoDB(logger, db),
+		User:          mongodb.NewUserMongoDB(db),
 	}
 }
 

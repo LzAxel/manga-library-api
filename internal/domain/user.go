@@ -18,6 +18,7 @@ type User struct {
 	Username     string    `json:"username" bson:"username"`
 	PasswordHash string    `json:"passwordHash" bson:"passwordHash"`
 	IsEditor     bool      `json:"isEditor" bson:"isEditor"`
+	IsAdmin      bool      `json:"isAdmin" bson:"isAdmin"`
 	CreatedAt    time.Time `json:"createdAt" bson:"createdAt"`
 }
 

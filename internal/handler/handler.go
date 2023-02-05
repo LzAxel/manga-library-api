@@ -48,6 +48,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			upload.POST("/preview", h.uploadMangaPreview)
 			upload.DELETE("/preview/:id", h.deleteMangaPreview)
 		}
+		user := api.Group("/user")
+		{
+			user.GET("/:username", h.getUserByUsername)
+			user.PATCH("/:id", h.updateUser)
+			user.DELETE("/:id", h.deleteUser)
+		}
 	}
 	router.GET("/docs", func(ctx *gin.Context) {
 		ctx.Redirect(http.StatusPermanentRedirect, "/swagger/index.html")
