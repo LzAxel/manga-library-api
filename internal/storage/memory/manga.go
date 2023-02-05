@@ -33,9 +33,9 @@ func (m *MangaMemory) Create(ctx context.Context, manga domain.Manga) (string, e
 		}
 	}
 
-	m.m.Store(manga.Id, manga)
+	m.m.Store(manga.ID, manga)
 
-	return manga.Id, nil
+	return manga.ID, nil
 }
 func (m *MangaMemory) GetLatest(ctx context.Context) ([]domain.Manga, error) {
 	var mangaList []domain.Manga
@@ -96,7 +96,7 @@ func (m *MangaMemory) Delete(ctx context.Context, mangaId string) error {
 	return nil
 }
 func (m *MangaMemory) Update(ctx context.Context, mangaDTO domain.UpdateMangaDTO) error {
-	loadedManga, ok := m.m.Load(mangaDTO.Id)
+	loadedManga, ok := m.m.Load(mangaDTO.ID)
 	if !ok {
 		return domain.ErrNotFound
 	}
@@ -124,7 +124,7 @@ func (m *MangaMemory) Update(ctx context.Context, mangaDTO domain.UpdateMangaDTO
 		manga.ReleaseYear = *mangaDTO.ReleaseYear
 	}
 
-	m.m.Store(manga.Id, manga)
+	m.m.Store(manga.ID, manga)
 
 	return nil
 }

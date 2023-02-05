@@ -24,7 +24,7 @@ func NewMangaService(storage storage.Manga, logger logger.Logger) *MangaService 
 
 func (s *MangaService) Create(ctx context.Context, userId string, mangaDTO domain.CreateMangaDTO) (string, error) {
 	manga := domain.Manga{
-		Id:                uuid.NewString(),
+		ID:                uuid.NewString(),
 		Title:             mangaDTO.Title,
 		AlternativeTitles: mangaDTO.AlternativeTitles,
 		Slug:              slug.Make(mangaDTO.Title),
@@ -58,7 +58,7 @@ func (s *MangaService) Delete(ctx context.Context, userId string, mangaId string
 }
 
 func (s *MangaService) Update(ctx context.Context, userId string, mangaDTO domain.UpdateMangaDTO) error {
-	manga, err := s.storage.GetById(ctx, mangaDTO.Id)
+	manga, err := s.storage.GetById(ctx, mangaDTO.ID)
 	if err != nil {
 		return err
 	}

@@ -48,5 +48,5 @@ func (s *AuthorizationMongoDB) SignIn(ctx context.Context, username string) (pas
 	cur := coll.FindOne(ctx, bson.M{"username": username})
 	cur.Decode(&user)
 
-	return user.PasswordHash, user.Id, cur.Err()
+	return user.PasswordHash, user.ID, cur.Err()
 }

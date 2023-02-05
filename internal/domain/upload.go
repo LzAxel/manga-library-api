@@ -5,7 +5,7 @@ import (
 )
 
 type Preview struct {
-	Id         string    `json:"_id" bson:"_id"`
+	ID         string    `json:"_id" bson:"_id"`
 	FileName   string    `json:"fileName" bson:"fileName"`
 	UploaderId string    `json:"uploaderId" bson:"uploaderId"`
 	URL        string    `json:"url" bson:"url"`

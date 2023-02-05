@@ -11,7 +11,7 @@ var (
 )
 
 type Manga struct {
-	Id                string    `json:"_id" bson:"_id"`
+	ID                string    `json:"_id" bson:"_id"`
 	Title             string    `json:"title" bson:"title"`
 	Slug              string    `json:"slug" bson:"slug"`
 	AlternativeTitles []string  `json:"alternativeTitles" bson:"alternativeTitles"`
@@ -36,7 +36,7 @@ type CreateMangaDTO struct {
 }
 
 type UpdateMangaDTO struct {
-	Id                string    `json:"-" bson:"_id"`
+	ID                string    `json:"-" bson:"_id"`
 	Title             *string   `json:"title"`
 	AlternativeTitles *[]string `json:"alternativeTitles"`
 	Description       *string   `json:"description"`
@@ -45,9 +45,4 @@ type UpdateMangaDTO struct {
 	AgeRating         *int      `json:"ageRating"`
 	ReleaseYear       *int      `json:"releaseYear"`
 	Slug              string    `json:"-"`
-}
-
-type GetMangaDTO struct {
-	Id   string
-	Slug string
 }

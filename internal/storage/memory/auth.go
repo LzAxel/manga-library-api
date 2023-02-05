@@ -22,9 +22,9 @@ func NewAuthMemory(logger logger.Logger) *AuthMemory {
 
 func (m *AuthMemory) SignUp(ctx context.Context, user domain.User) error {
 	m.logger.Debugln("storage signing up accont")
-	user.Id = uuid.NewString()
+	user.ID = uuid.NewString()
 	user.CreatedAt = time.Now()
-	if _, ok := m.m.Load(user.Id); ok {
+	if _, ok := m.m.Load(user.ID); ok {
 		return errors.New("username already exists")
 	}
 
@@ -46,5 +46,5 @@ func (m *AuthMemory) SignIn(ctx context.Context, username string) (password, use
 		return "", "", domain.ErrFailedToGet
 	}
 
-	return user.PasswordHash, user.Id, nil
+	return user.PasswordHash, user.ID, nil
 }

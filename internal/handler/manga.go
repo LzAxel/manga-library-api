@@ -172,7 +172,7 @@ func (h *Handler) updateManga(c *gin.Context) {
 		ErrorResponse(c, http.StatusBadRequest, "invalid input")
 		return
 	}
-	mangaDTO.Id = mangaId
+	mangaDTO.ID = mangaId
 	err = h.services.Manga.Update(c, userId, mangaDTO)
 	if err != nil {
 		h.logger.Errorln(err)

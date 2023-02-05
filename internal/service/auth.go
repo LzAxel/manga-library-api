@@ -44,7 +44,7 @@ func (s *AuthorizationService) SignUp(ctx context.Context, userDTO domain.Create
 	id := uuid.NewString()
 
 	user = domain.User{
-		Id:           id,
+		ID:           id,
 		IsEditor:     false,
 		Username:     userDTO.Username,
 		PasswordHash: hashedPassword,

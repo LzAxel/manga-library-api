@@ -14,7 +14,7 @@ var (
 )
 
 type User struct {
-	Id           string    `json:"_id" bson:"_id"`
+	ID           string    `json:"_id" bson:"_id"`
 	Username     string    `json:"username" bson:"username"`
 	PasswordHash string    `json:"passwordHash" bson:"passwordHash"`
 	IsEditor     bool      `json:"isEditor" bson:"isEditor"`

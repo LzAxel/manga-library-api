@@ -19,7 +19,7 @@ func NewPreviewMemory(logger logger.Logger) *PreviewMemory {
 }
 
 func (m *PreviewMemory) Create(ctx context.Context, preview domain.Preview) (string, error) {
-	m.m.Store(preview.Id, preview)
+	m.m.Store(preview.ID, preview)
 
 	return preview.URL, nil
 }

@@ -118,7 +118,7 @@ func (m *MangaMongoDB) Update(ctx context.Context, mangaDTO domain.UpdateMangaDT
 		setQuery = append(setQuery, bson.E{Key: "releaseYear", Value: &mangaDTO.ReleaseYear})
 	}
 
-	result, err := coll.UpdateByID(ctx, mangaDTO.Id, bson.D{{Key: "$set", Value: setQuery}})
+	result, err := coll.UpdateByID(ctx, mangaDTO.ID, bson.D{{Key: "$set", Value: setQuery}})
 	if err != nil {
 		return err
 	}

@@ -45,7 +45,7 @@ func (s *PreviewService) Create(ctx context.Context, file multipart.File, filena
 	}
 
 	preview := domain.Preview{
-		Id:         id,
+		ID:         id,
 		FileName:   filename,
 		UploaderId: uploaderId,
 		URL:        previewUrlBase + filename,
