@@ -46,7 +46,7 @@ func (m *MangaMongoDB) GetLatest(ctx context.Context) ([]domain.Manga, error) {
 	coll := m.db.Collection(mangaCollection)
 	opts := options.Find().SetLimit(latestMangaLimit).SetSort(bson.D{{Key: "createdAt", Value: -1}})
 
-	cur, err := coll.Find(ctx, bson.D{}, opts)
+	cur, err := coll.Find(ctx, bson.D{{Key: "isPublished", Value: true}}, opts)
 	if err != nil {
 		return []domain.Manga{}, err
 	}
@@ -116,6 +116,9 @@ func (m *MangaMongoDB) Update(ctx context.Context, mangaDTO domain.UpdateMangaDT
 	}
 	if mangaDTO.ReleaseYear != nil {
 		setQuery = append(setQuery, bson.E{Key: "releaseYear", Value: &mangaDTO.ReleaseYear})
+	}
+	if mangaDTO.IsPublished != nil {
+		setQuery = append(setQuery, bson.E{Key: "isPublished", Value: &mangaDTO.IsPublished})
 	}
 
 	result, err := coll.UpdateByID(ctx, mangaDTO.ID, bson.D{{Key: "$set", Value: setQuery}})

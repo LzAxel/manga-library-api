@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gosimple/slug"
+	"github.com/sirupsen/logrus"
 
 	"github.com/google/uuid"
 )
@@ -35,6 +36,7 @@ func (s *MangaService) Create(ctx context.Context, userId string, mangaDTO domai
 		AgeRating:         mangaDTO.AgeRating,
 		UploaderId:        userId,
 		ReleaseYear:       mangaDTO.ReleaseYear,
+		IsPublished:       false,
 		CreatedAt:         time.Now(),
 	}
 
@@ -57,15 +59,19 @@ func (s *MangaService) Delete(ctx context.Context, userId string, mangaId string
 	return s.storage.Delete(ctx, mangaId)
 }
 
-func (s *MangaService) Update(ctx context.Context, userId string, mangaDTO domain.UpdateMangaDTO) error {
+func (s *MangaService) Update(ctx context.Context, userId string, roles domain.Roles, mangaDTO domain.UpdateMangaDTO) error {
 	manga, err := s.storage.GetById(ctx, mangaDTO.ID)
 	if err != nil {
 		return err
 	}
-
-	if manga.UploaderId != userId {
+	s.logger.Debugf("roles: admin=%v editor=%v", roles.IsAdmin, roles.IsEditor)
+	if manga.UploaderId != userId && !roles.IsAdmin && !roles.IsEditor {
 		// TODO: make general error in utils for this case
+		s.logger.WithFields(logrus.Fields{"userID": userId, "upldrID": manga.UploaderId}).Debugln("validating")
 		return errors.New("you are not an owner")
+	}
+	if mangaDTO.IsPublished != nil && !roles.IsAdmin {
+		return errors.New("you don't have premission")
 	}
 
 	if mangaDTO.Title != nil {

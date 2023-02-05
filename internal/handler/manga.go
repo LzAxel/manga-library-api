@@ -157,6 +157,7 @@ func (h *Handler) deleteManga(c *gin.Context) {
 func (h *Handler) updateManga(c *gin.Context) {
 	h.logger.Debugln("updating manga")
 	var mangaId = c.Param("id")
+	var mangaDTO domain.UpdateMangaDTO
 
 	userId, err := h.getUserId(c)
 	if err != nil {
@@ -165,7 +166,12 @@ func (h *Handler) updateManga(c *gin.Context) {
 		return
 	}
 
-	var mangaDTO domain.UpdateMangaDTO
+	roles, err := h.getUserRoles(c, userId)
+	if err != nil {
+		h.logger.Errorln(err)
+		ErrorResponse(c, http.StatusInternalServerError, "failed to get user roles")
+		return
+	}
 
 	if err := c.BindJSON(&mangaDTO); err != nil {
 		h.logger.Errorln(err)
@@ -173,7 +179,7 @@ func (h *Handler) updateManga(c *gin.Context) {
 		return
 	}
 	mangaDTO.ID = mangaId
-	err = h.services.Manga.Update(c, userId, mangaDTO)
+	err = h.services.Manga.Update(c, userId, roles, mangaDTO)
 	if err != nil {
 		h.logger.Errorln(err)
 		ErrorResponse(c, http.StatusInternalServerError, "failed to update manga")

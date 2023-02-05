@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"manga-library/internal/domain"
 	"net/http"
 	"strings"
 
@@ -50,4 +51,16 @@ func (h *Handler) getUserId(ctx *gin.Context) (string, error) {
 	}
 
 	return userId, nil
+}
+
+func (h *Handler) getUserRoles(ctx *gin.Context, userID string) (domain.Roles, error) {
+	var roles domain.Roles
+
+	user, err := h.services.User.GetByID(ctx, userID)
+	if err != nil {
+		return roles, err
+	}
+	roles = domain.GetRolesFromUser(user)
+
+	return roles, nil
 }
