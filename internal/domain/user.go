@@ -16,7 +16,7 @@ var (
 type User struct {
 	ID           string    `json:"_id" bson:"_id"`
 	Username     string    `json:"username" bson:"username"`
-	PasswordHash []byte    `json:"passwordHash" bson:"passwordHash"`
+	PasswordHash []byte    `json:"-" bson:"passwordHash"`
 	IsEditor     bool      `json:"isEditor" bson:"isEditor"`
 	IsAdmin      bool      `json:"isAdmin" bson:"isAdmin"`
 	CreatedAt    time.Time `json:"createdAt" bson:"createdAt"`
