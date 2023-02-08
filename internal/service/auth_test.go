@@ -7,93 +7,130 @@ import (
 
 	"manga-library/internal/domain"
 	"manga-library/internal/service"
-	"manga-library/internal/storage"
+	mock_storage "manga-library/internal/storage/mocks"
+	"manga-library/pkg/hash"
 	"manga-library/pkg/jwt"
 	"manga-library/pkg/logger"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAuth_SignUp(t *testing.T) {
-	t.Run("creating new user", func(t *testing.T) {
-		var (
-			l      = logger.NewLogrusLogger("info", false, false)
-			jwt    = jwt.NewJWTManager("secret", int(time.Hour)*12)
-			admUsr = domain.AdminUser{Username: "admin", Password: "admin"}
-			svc    = service.NewAuthorizationService(storage.NewInMemoryStorage(l),
-				l, jwt, admUsr)
-		)
+	var (
+		l      = logger.NewLogrusLogger("info", false, false)
+		jwt    = jwt.NewJWTManager("secret", int(time.Hour)*12)
+		admUsr = domain.AdminUser{Username: "admin", Password: "admin"}
+		ctrl   = gomock.NewController(t)
+		stor   = mock_storage.NewMockAuthorization(ctrl)
+		svc    = service.NewAuthorizationService(stor, l, jwt, admUsr)
+		ctx    = context.Background()
+	)
 
-		type testCase struct {
-			username    string
-			password    string
-			expectedErr error
+	t.Run("sing up existed user", func(t *testing.T) {
+		user := domain.CreateUserDTO{
+			Username: "existedUser",
+			Password: "existedPassword",
 		}
+		stor.EXPECT().SignUp(ctx, gomock.Any()).Return(domain.ErrUsernameExists)
+		actual := svc.SignUp(ctx, user)
 
-		testCases := []testCase{
-			{
-				username:    "admin",
-				password:    "admin",
-				expectedErr: domain.ErrUsernameExists,
-			},
-			{
-				username:    "testuser",
-				password:    "testpassword",
-				expectedErr: nil,
-			},
+		assert.ErrorIs(t, actual, domain.ErrUsernameExists)
+	})
+
+	t.Run("sing up new user", func(t *testing.T) {
+		user := domain.CreateUserDTO{
+			Username: "newUser",
+			Password: "newPassword",
 		}
+		stor.EXPECT().SignUp(ctx, gomock.Any()).Return(nil)
+		actual := svc.SignUp(context.TODO(), user)
 
-		for _, tc := range testCases {
-			user := domain.CreateUserDTO{
-				Username: tc.username,
-				Password: tc.password}
-
-			actual := svc.SignUp(context.Background(), user)
-			assert.Equal(t, tc.expectedErr, actual)
-		}
+		require.NoError(t, actual)
 	})
 }
 
 func TestAuth_SignIn(t *testing.T) {
 	var (
-		l       = logger.NewLogrusLogger("info", false, false)
-		storage = storage.NewInMemoryStorage(l)
-		jwt     = jwt.NewJWTManager("secret", int(time.Hour)*12)
-		admUsr  = domain.AdminUser{Username: "admin", Password: "admin"}
-		newUsr  = domain.CreateUserDTO{
-			Username: "testuser",
-			Password: "testpassword"}
-		existedUsr = domain.CreateUserDTO{
-			Username: "newuser",
-			Password: "testpassword"}
-		svc = service.NewAuthorizationService(storage, l, jwt, admUsr)
+		l            = logger.NewLogrusLogger("info", false, false)
+		jwt          = jwt.NewJWTManager("secret", int(time.Hour)*12)
+		admUsr       = domain.AdminUser{Username: "admin", Password: "admin"}
+		ctrl         = gomock.NewController(t)
+		stor         = mock_storage.NewMockAuthorization(ctrl)
+		salt         = hash.GenerateSalt()
+		passwordHash = hash.HashPassword(salt, "password")
+		svc          = service.NewAuthorizationService(stor, l, jwt, admUsr)
+		ctx          = context.Background()
 	)
 
-	t.Run("login existed user", func(t *testing.T) {
-		svc.SignUp(context.TODO(), existedUsr)
-		token, err := svc.SignIn(context.Background(), domain.LoginUserDTO(existedUsr))
-		assert.Equal(t, nil, err)
-		assert.NotEmpty(t, token)
-	})
+	type testCase struct {
+		name    string
+		data    domain.LoginUserDTO
+		prepare func(username string)
 
-	t.Run("login existed user with wrong password", func(t *testing.T) {
-		user := domain.LoginUserDTO(existedUsr)
-		user.Password = "2222222222222222"
+		expErr    error
+		expReturn bool
+	}
 
-		token, err := svc.SignIn(context.Background(), user)
-		assert.Equal(t, domain.ErrWrongAuthCreditionals, err)
-		assert.Empty(t, token)
-	})
-
-	t.Run("login unexisted user", func(t *testing.T) {
-		token, err := svc.SignIn(context.Background(), domain.LoginUserDTO(newUsr))
-		assert.Equal(t, domain.ErrWrongAuthCreditionals, err)
-		assert.Empty(t, token)
-	})
-
-	t.Run("login admin user", func(t *testing.T) {
-		token, err := svc.SignIn(context.Background(), domain.LoginUserDTO(admUsr))
-		assert.Equal(t, nil, err)
-		assert.NotEmpty(t, token)
-	})
+	testCases := []testCase{
+		{
+			name: "login admin user",
+			data: domain.LoginUserDTO{
+				Username: admUsr.Username,
+				Password: admUsr.Password,
+			},
+			prepare:   nil,
+			expErr:    nil,
+			expReturn: true,
+		},
+		{
+			name: "login unexisted user",
+			data: domain.LoginUserDTO{
+				Username: "unexistedUser",
+				Password: "password",
+			},
+			prepare: func(username string) {
+				stor.EXPECT().SignIn(ctx, gomock.Any()).Return(passwordHash, "user-id", domain.ErrNotFound)
+			},
+			expErr:    domain.ErrWrongAuthCreditionals,
+			expReturn: false,
+		},
+		{
+			name: "login existed user",
+			data: domain.LoginUserDTO{
+				Username: "existedUser",
+				Password: "password",
+			},
+			prepare: func(username string) {
+				stor.EXPECT().SignIn(ctx, username).Return(passwordHash, "user-id", nil)
+			},
+			expErr:    nil,
+			expReturn: true,
+		},
+		{
+			name: "login with invalid password",
+			data: domain.LoginUserDTO{
+				Username: "existedUser",
+				Password: "invalidPassword",
+			},
+			prepare: func(username string) {
+				stor.EXPECT().SignIn(ctx, username).Return(passwordHash, "user-id", nil)
+			},
+			expErr:    domain.ErrWrongAuthCreditionals,
+			expReturn: false,
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			if testCase.prepare != nil {
+				testCase.prepare(testCase.data.Username)
+			}
+			actual, err := svc.SignIn(ctx, testCase.data)
+			assert.Equal(t, testCase.expErr, err)
+			if testCase.expReturn {
+				assert.NotEmpty(t, actual)
+			}
+		})
+	}
 }
