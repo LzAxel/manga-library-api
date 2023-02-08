@@ -2,14 +2,12 @@ package service
 
 import (
 	"context"
-	"errors"
 	"manga-library/internal/domain"
 	"manga-library/internal/storage"
 	"manga-library/pkg/logger"
 	"time"
 
 	"github.com/gosimple/slug"
-	"github.com/sirupsen/logrus"
 
 	"github.com/google/uuid"
 )
@@ -64,14 +62,13 @@ func (s *MangaService) Update(ctx context.Context, userId string, roles domain.R
 	if err != nil {
 		return err
 	}
-	s.logger.Debugf("roles: admin=%v editor=%v", roles.IsAdmin, roles.IsEditor)
 	if manga.UploaderId != userId && !roles.IsAdmin && !roles.IsEditor {
 		// TODO: make general error in utils for this case
-		s.logger.WithFields(logrus.Fields{"userID": userId, "upldrID": manga.UploaderId}).Debugln("validating")
-		return errors.New("you are not an owner")
+
+		return domain.ErrNotTheOwner
 	}
 	if mangaDTO.IsPublished != nil && !roles.IsAdmin {
-		return errors.New("you don't have premission")
+		return domain.ErrMangaPublishByUser
 	}
 
 	if mangaDTO.Title != nil {
