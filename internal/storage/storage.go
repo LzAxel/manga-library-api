@@ -31,7 +31,7 @@ type User interface {
 
 type Authorization interface {
 	SignUp(ctx context.Context, user domain.User) error
-	SignIn(ctx context.Context, username string) (password, userId string, err error)
+	SignIn(ctx context.Context, username string) (password []byte, userId string, err error)
 }
 
 type Storage struct {

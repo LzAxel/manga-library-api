@@ -13,10 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	hashSalt = "sajcfluyq89y414ynr9c34safwceq41c4431235c124"
-)
-
 type AuthorizationService struct {
 	storage    storage.Authorization
 	logger     logger.Logger
@@ -36,16 +32,15 @@ func NewAuthorizationService(storage storage.Authorization, logger logger.Logger
 func (s *AuthorizationService) SignUp(ctx context.Context, userDTO domain.CreateUserDTO) error {
 	var user domain.User
 
-	hashedPassword, err := hash.HashPassword(userDTO.Password, hashSalt)
-	if err != nil {
-		return err
-	}
+	salt := hash.GenerateSalt()
+	hashedPassword := hash.HashPassword(salt, userDTO.Password)
 
 	id := uuid.NewString()
 
 	user = domain.User{
 		ID:           id,
 		IsEditor:     false,
+		IsAdmin:      false,
 		Username:     userDTO.Username,
 		PasswordHash: hashedPassword,
 		CreatedAt:    time.Now(),
@@ -57,7 +52,6 @@ func (s *AuthorizationService) SignUp(ctx context.Context, userDTO domain.Create
 }
 
 func (s *AuthorizationService) SignIn(ctx context.Context, userDTO domain.LoginUserDTO) (string, error) {
-
 	if userDTO == domain.LoginUserDTO(s.adminUser) {
 		// TODO fix admin id
 		token := s.jwtManager.NewJWT("admin-user-id")
@@ -65,12 +59,12 @@ func (s *AuthorizationService) SignIn(ctx context.Context, userDTO domain.LoginU
 		return token, nil
 	}
 
-	password, userId, err := s.storage.SignIn(ctx, userDTO.Username)
+	hashedPassword, userId, err := s.storage.SignIn(ctx, userDTO.Username)
 	if err != nil {
-		return "", err
+		return "", domain.ErrWrongAuthCreditionals
 	}
 
-	if err := hash.ComparePassword(password, userDTO.Password+hashSalt); err != nil {
+	if !hash.ComparePassword(hashedPassword, userDTO.Password) {
 		return "", domain.ErrWrongAuthCreditionals
 	}
 

@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	ErrNotFound   = errors.New("not found")
-	ErrNotAnOwner = errors.New("not an owner of manga")
+	ErrNotFound    = errors.New("not found")
+	ErrNotTheOwner = errors.New("you are not the owner")
 
 	ErrWrongAuthCreditionals = errors.New("wrong password or username")
 	ErrUsernameExists        = errors.New("username already exists")
@@ -16,7 +16,7 @@ var (
 type User struct {
 	ID           string    `json:"_id" bson:"_id"`
 	Username     string    `json:"username" bson:"username"`
-	PasswordHash string    `json:"passwordHash" bson:"passwordHash"`
+	PasswordHash []byte    `json:"passwordHash" bson:"passwordHash"`
 	IsEditor     bool      `json:"isEditor" bson:"isEditor"`
 	IsAdmin      bool      `json:"isAdmin" bson:"isAdmin"`
 	CreatedAt    time.Time `json:"createdAt" bson:"createdAt"`

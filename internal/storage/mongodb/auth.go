@@ -40,7 +40,7 @@ func (s *AuthorizationMongoDB) SignUp(ctx context.Context, user domain.User) err
 	return nil
 }
 
-func (s *AuthorizationMongoDB) SignIn(ctx context.Context, username string) (password, userId string, err error) {
+func (s *AuthorizationMongoDB) SignIn(ctx context.Context, username string) (password []byte, userId string, err error) {
 	var user domain.User
 
 	coll := s.db.Collection(userCollection)
