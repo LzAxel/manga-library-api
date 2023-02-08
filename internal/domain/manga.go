@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	ErrMangaTitleExists = errors.New("manga title already exists")
-	ErrFailedToGet      = errors.New("failed to get manga")
+	ErrMangaTitleExists   = errors.New("manga title already exists")
+	ErrFailedToGet        = errors.New("failed to get manga")
+	ErrMangaPublishByUser = errors.New("only admin user can publish manga")
 )
 
 type Manga struct {
