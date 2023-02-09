@@ -11,13 +11,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 const chapterImageFormats = ".jpg .jpeg"
 
 func CreateChapterArchive(chapterPath, mangaTitle string, volume, number int) error {
-	start := time.Now()
 	file, err := os.Create(filepath.Join(chapterPath,
 		fmt.Sprintf("%v %d Том %d Глава.zip", mangaTitle, volume, number)))
 	if err != nil {
@@ -31,7 +29,6 @@ func CreateChapterArchive(chapterPath, mangaTitle string, volume, number int) er
 	if err := addPagesToArchive(zipWriter, chapterPath); err != nil {
 		return err
 	}
-	fmt.Println("create chapter archive:", time.Since(start))
 	return nil
 }
 
