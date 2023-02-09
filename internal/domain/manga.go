@@ -15,6 +15,7 @@ type Manga struct {
 	ID                string    `json:"_id" bson:"_id"`
 	Title             string    `json:"title" bson:"title"`
 	Slug              string    `json:"slug" bson:"slug"`
+	Author            string    `json:"author" bson:"author"`
 	Chapters          []Chapter `json:"chapters" bson:"chapters"`
 	Description       string    `json:"description" bson:"description"`
 	PreviewURL        string    `json:"previewUrl" bson:"previewUrl"`
@@ -31,6 +32,7 @@ type Manga struct {
 type CreateMangaDTO struct {
 	Title             string   `json:"title" binding:"required"`
 	AlternativeTitles []string `json:"alternativeTitles"`
+	Author            string   `json:"author" binding:"required"`
 	Description       string   `json:"description" binding:"required"`
 	Tags              []string `json:"tags" binding:"required"`
 	PreviewURL        string   `json:"previewUrl" binding:"required"`
@@ -41,6 +43,7 @@ type CreateMangaDTO struct {
 type UpdateMangaDTO struct {
 	ID                string    `json:"-" bson:"_id"`
 	Title             *string   `json:"title"`
+	Author            *string   `json:"author"`
 	AlternativeTitles *[]string `json:"alternativeTitles"`
 	Description       *string   `json:"description"`
 	Tags              *[]string `json:"tags"`

@@ -25,8 +25,10 @@ func (s *MangaService) Create(ctx context.Context, userId string, mangaDTO domai
 	manga := domain.Manga{
 		ID:                uuid.NewString(),
 		Title:             mangaDTO.Title,
+		Author:            mangaDTO.Author,
 		AlternativeTitles: mangaDTO.AlternativeTitles,
 		Slug:              slug.Make(mangaDTO.Title),
+		Chapters:          []domain.Chapter{},
 		Description:       mangaDTO.Description,
 		Tags:              mangaDTO.Tags,
 		PreviewURL:        mangaDTO.PreviewURL,
@@ -63,8 +65,6 @@ func (s *MangaService) Update(ctx context.Context, userId string, roles domain.R
 		return err
 	}
 	if manga.UploaderId != userId && !roles.IsAdmin && !roles.IsEditor {
-		// TODO: make general error in utils for this case
-
 		return domain.ErrNotTheOwner
 	}
 	if mangaDTO.IsPublished != nil && !roles.IsAdmin {

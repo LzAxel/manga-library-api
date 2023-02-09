@@ -120,6 +120,9 @@ func (m *MangaMongoDB) Update(ctx context.Context, mangaDTO domain.UpdateMangaDT
 	if mangaDTO.IsPublished != nil {
 		setQuery = append(setQuery, bson.E{Key: "isPublished", Value: &mangaDTO.IsPublished})
 	}
+	if mangaDTO.Author != nil {
+		setQuery = append(setQuery, bson.E{Key: "author", Value: &mangaDTO.Author})
+	}
 
 	result, err := coll.UpdateByID(ctx, mangaDTO.ID, bson.D{{Key: "$set", Value: setQuery}})
 	if err != nil {
