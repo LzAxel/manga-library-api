@@ -8,6 +8,7 @@ import (
 var (
 	ErrNotFound    = errors.New("not found")
 	ErrNotTheOwner = errors.New("you are not the owner")
+	ErrNotEditor   = errors.New("you are not editor")
 
 	ErrWrongAuthCreditionals = errors.New("wrong password or username")
 	ErrUsernameExists        = errors.New("username already exists")

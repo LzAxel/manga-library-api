@@ -128,3 +128,7 @@ func (m *MangaMemory) Update(ctx context.Context, mangaDTO domain.UpdateMangaDTO
 
 	return nil
 }
+
+func (m *MangaMemory) UploadChapter(ctx context.Context, chapter domain.Chapter) error {
+	return nil
+}

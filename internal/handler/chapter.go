@@ -19,6 +19,11 @@ func (h *Handler) uploadChapter(ctx *gin.Context) {
 		ErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
+	roles, err := h.getUserRoles(ctx, uploaderID)
+	if err != nil {
+		ErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	// TODO: unified error
 	if err := ctx.ShouldBindWith(&chapterDTO, binding.FormMultipart); err != nil {
@@ -33,10 +38,8 @@ func (h *Handler) uploadChapter(ctx *gin.Context) {
 	}
 
 	h.logger.Debugln("binded successfully")
-	if err := h.services.Manga.UploadChapter(ctx, chapterDTO); err != nil {
+	if err := h.services.Manga.UploadChapter(ctx, chapterDTO, roles); err != nil {
 		ErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	h.logger.Debugln(chapterDTO)
 }

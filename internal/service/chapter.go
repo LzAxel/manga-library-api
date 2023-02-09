@@ -1,17 +1,13 @@
 package service
 
 import (
-	"archive/zip"
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"manga-library/internal/domain"
+	"manga-library/pkg/archive"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -20,10 +16,13 @@ const (
 	chapterImageFormats = ".jpg .jpeg"
 )
 
-func (s *MangaService) UploadChapter(ctx context.Context, chapterDTO domain.UploadChapterDTO) error {
+func (s *MangaService) UploadChapter(ctx context.Context, chapterDTO domain.UploadChapterDTO, roles domain.Roles) error {
 	manga, err := s.storage.GetBySlug(ctx, chapterDTO.MangaSlug)
 	if err != nil {
 		return err
+	}
+	if manga.UploaderId != chapterDTO.UploaderID && !roles.IsAdmin && !roles.IsEditor {
+		return domain.ErrNotEditor
 	}
 
 	uploadPath := filepath.Join(uploadMangaPath, manga.Slug,
@@ -35,21 +34,6 @@ func (s *MangaService) UploadChapter(ctx context.Context, chapterDTO domain.Uplo
 		}
 	}
 
-	file, err := chapterDTO.File.Open()
-	if err != nil {
-		return errors.New("filed to open file")
-	}
-	defer file.Close()
-
-	archiveBytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		return errors.New("filed to open file")
-	}
-	zipReader, err := zip.NewReader(bytes.NewReader(archiveBytes), int64(len(archiveBytes)))
-	if err != nil {
-		return errors.New("filed to get zip reader")
-	}
-
 	if _, err := os.Stat(uploadPath); errors.Is(err, os.ErrNotExist) {
 		err := os.MkdirAll(uploadPath, 0777)
 		if err != nil {
@@ -58,70 +42,33 @@ func (s *MangaService) UploadChapter(ctx context.Context, chapterDTO domain.Uplo
 		}
 	}
 
-	outputZip, err := os.Create(filepath.Join(uploadPath,
-		fmt.Sprintf("%v %d Том %d Глава.zip", manga.Title, chapterDTO.Volume, chapterDTO.Number)))
-	if err != nil {
-		return err
-	}
-	defer outputZip.Close()
+	pageCount, err := archive.UnzipUploadChapterArchive(uploadPath, chapterDTO.File)
 
-	newArchive := zip.NewWriter(outputZip)
-	defer newArchive.Close()
-
-	chapterPageCounter := 0
-	for _, zipFile := range zipReader.File {
-		if !strings.Contains(chapterImageFormats, filepath.Ext(zipFile.Name)) {
-			continue
-		}
-		s.logger.Debugf("reading file: %v", zipFile.Name)
-		fileBytes, err := readZipFile(zipFile)
-		if err != nil {
-			s.logger.Debugf("failed to read file: %v", zipFile.Name)
-			continue
-		}
-		zipFile.Name = fmt.Sprintf("%v%v", chapterPageCounter, filepath.Ext(zipFile.Name))
-		outputFile, err := os.Create(filepath.Join(uploadPath, zipFile.Name))
-		if err != nil {
-			return err
-		}
-		defer outputFile.Close()
-		io.Copy(outputFile, bytes.NewReader(fileBytes))
-
-		fileWriter, err := newArchive.Create(zipFile.Name)
-		if err != nil {
-			return err
-		}
-		fileWriter.Write(fileBytes)
-
-		chapterPageCounter++
+	if err := archive.CreateChapterArchive(uploadPath, manga.Title, chapterDTO.Volume, chapterDTO.Number); err != nil {
+		return errors.New("failed to create chapter archive")
 	}
 
 	err = s.storage.UploadChapter(ctx, domain.Chapter{
 		Volume:      chapterDTO.Volume,
 		Number:      chapterDTO.Number,
-		PageCount:   chapterPageCounter,
+		PageCount:   pageCount,
 		MangaSlug:   manga.Slug,
 		UploaderId:  chapterDTO.UploaderID,
 		IsPublished: false,
-
-		UploadedAt: time.Now(),
+		UploadedAt:  time.Now(),
 	})
 	if err != nil {
-		err = os.RemoveAll(uploadPath)
-		if err != nil {
-			s.logger.Fatalln(err)
-		}
-		return errors.New("failed to save chapter")
+		deleteChapterFiles(uploadPath)
+		return err
 	}
 
 	return nil
 }
 
-func readZipFile(zf *zip.File) ([]byte, error) {
-	f, err := zf.Open()
+func deleteChapterFiles(chapterPath string) error {
+	err := os.RemoveAll(chapterPath)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	defer f.Close()
-	return ioutil.ReadAll(f)
+	return nil
 }
