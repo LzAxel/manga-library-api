@@ -23,7 +23,7 @@ import (
 const (
 	previewUploadDir = `.\upload\preview\`
 	previewUrlBase   = `preview/`
-	previewFormats   = "png jpeg jpg"
+	imageFormats     = "png jpeg jpg"
 )
 
 type PreviewService struct {
@@ -40,7 +40,7 @@ func (s *PreviewService) Create(ctx context.Context, file multipart.File, filena
 
 	filename = id + filepath.Ext(filename)
 
-	if !strings.Contains(previewFormats, filepath.Ext(filename)) {
+	if !strings.Contains(imageFormats, filepath.Ext(filename)) {
 		return "", errors.New("invalid file extension")
 	}
 

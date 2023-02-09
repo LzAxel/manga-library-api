@@ -15,6 +15,7 @@ type Manga struct {
 	ID                string    `json:"_id" bson:"_id"`
 	Title             string    `json:"title" bson:"title"`
 	Slug              string    `json:"slug" bson:"slug"`
+	Chapters          []Chapter `json:"chapters" bson:"chapters"`
 	Description       string    `json:"description" bson:"description"`
 	PreviewURL        string    `json:"previewUrl" bson:"previewUrl"`
 	UploaderId        string    `json:"uploaderId" bson:"uploaderId"`

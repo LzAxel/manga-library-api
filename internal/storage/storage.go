@@ -17,6 +17,7 @@ type Manga interface {
 	GetBySlug(ctx context.Context, mangaSlug string) (domain.Manga, error)
 	Delete(ctx context.Context, mangaId string) error
 	Update(ctx context.Context, mangaDTO domain.UpdateMangaDTO) error
+	UploadChapter(ctx context.Context, chapter domain.Chapter) error
 }
 
 type Preview interface {
