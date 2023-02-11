@@ -17,8 +17,8 @@ func NewServer(logger logger.Logger) *Server {
 
 const (
 	maxHeaderBytes = 1 << 20
-	readTimeout    = 10 * time.Second
-	writeTimeout   = 10 * time.Second
+	readTimeout    = 30 * time.Second
+	writeTimeout   = 30 * time.Second
 )
 
 func (s *Server) Run(port, bindIP string, handler http.Handler) error {

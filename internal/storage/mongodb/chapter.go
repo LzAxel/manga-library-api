@@ -18,12 +18,16 @@ func (m *MangaMongoDB) UploadChapter(ctx context.Context, chapter domain.Chapter
 	return nil
 }
 
-func (m *MangaMongoDB) DeleteChapter(ctx context.Context, chapter domain.Chapter) error {
+func (m *MangaMongoDB) DeleteChapter(ctx context.Context, chapter domain.DeleteChapterDTO) error {
 	coll := m.db.Collection(mangaCollection)
 
-	_, err := coll.UpdateOne(ctx, bson.M{"slug": chapter.MangaSlug}, bson.M{"$push": bson.M{"chapters": chapter}})
+	result, err := coll.UpdateOne(ctx, bson.M{"slug": chapter.MangaSlug},
+		bson.M{"$pull": bson.M{"chapters": bson.M{"volume": chapter.Volume, "number": chapter.Number}}})
 	if err != nil {
 		return err
+	}
+	if result.ModifiedCount == 0 {
+		return domain.ErrNotFound
 	}
 
 	return nil

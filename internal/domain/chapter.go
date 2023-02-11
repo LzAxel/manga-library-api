@@ -18,8 +18,15 @@ type Chapter struct {
 
 type UploadChapterDTO struct {
 	MangaSlug  string                `form:"mangaSlug" binding:"required"`
+	UploaderID string                `form:"-"`
 	Volume     int                   `form:"volume" binding:"required,numeric,gte=0"`
 	Number     int                   `form:"number" binding:"required,numeric,gte=0"`
-	UploaderID string                `form:"-"`
 	File       *multipart.FileHeader `form:"file" binding:"required"`
+}
+
+type DeleteChapterDTO struct {
+	MangaSlug  string
+	UploaderID string
+	Volume     int
+	Number     int
 }

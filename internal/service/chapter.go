@@ -8,7 +8,10 @@ import (
 	"manga-library/pkg/archive"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -17,10 +20,13 @@ const (
 )
 
 func (s *MangaService) UploadChapter(ctx context.Context, chapterDTO domain.UploadChapterDTO, roles domain.Roles) error {
+	s.logger.WithFields(logrus.Fields{"isAdmin": roles.IsAdmin, "isEditor": roles.IsEditor, "chapter": chapterDTO}).Debugln("uploading chapter service")
+
 	manga, err := s.storage.GetBySlug(ctx, chapterDTO.MangaSlug)
 	if err != nil {
 		return err
 	}
+
 	if manga.UploaderId != chapterDTO.UploaderID && !roles.IsAdmin && !roles.IsEditor {
 		return domain.ErrNotEditor
 	}
@@ -58,7 +64,40 @@ func (s *MangaService) UploadChapter(ctx context.Context, chapterDTO domain.Uplo
 		UploadedAt:  time.Now(),
 	})
 	if err != nil {
-		deleteChapterFiles(uploadPath)
+		dErr := deleteChapterFiles(uploadPath)
+		if dErr != nil {
+			s.logger.Errorf("failed to delete chapter files: %v", dErr)
+			return dErr
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (s *MangaService) DeleteChapter(ctx context.Context, chapterDTO domain.DeleteChapterDTO, roles domain.Roles) error {
+	chapterPath := filepath.Join(uploadMangaPath, chapterDTO.MangaSlug,
+		strconv.Itoa(chapterDTO.Volume), strconv.Itoa(chapterDTO.Number))
+
+	s.logger.WithFields(logrus.Fields{"isAdmin": roles.IsAdmin, "isEditor": roles.IsEditor, "chapter": chapterDTO}).Debugln("deleting chapter service")
+
+	manga, err := s.storage.GetBySlug(ctx, chapterDTO.MangaSlug)
+	if err != nil {
+		return errors.New("failed to get manga info")
+	}
+
+	if manga.UploaderId != chapterDTO.UploaderID && !roles.IsAdmin && !roles.IsEditor {
+		return domain.ErrNotEditor
+	}
+
+	err = s.storage.DeleteChapter(ctx, chapterDTO)
+	if err != nil {
+		return err
+	}
+
+	err = deleteChapterFiles(chapterPath)
+	if err != nil {
+		s.logger.Errorf("failed to delete chapter files: %v", err)
 		return err
 	}
 

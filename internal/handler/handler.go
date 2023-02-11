@@ -24,6 +24,7 @@ func NewHandler(service *service.Service, logger logger.Logger) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	h.logger.Infoln("routes initializated")
 	router := gin.New()
+	router.MaxMultipartMemory = 6
 
 	auth := router.Group("/auth")
 	{
@@ -51,6 +52,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		chapter := api.Group("/chapter")
 		{
 			chapter.POST("/", h.userIdentity, h.uploadChapter)
+			chapter.DELETE("/:mangaSlug/:volume/:number", h.userIdentity, h.deleteChapter)
 		}
 		user := api.Group("/user")
 		{

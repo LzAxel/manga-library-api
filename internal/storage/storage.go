@@ -18,6 +18,7 @@ type Manga interface {
 	Delete(ctx context.Context, mangaId string) error
 	Update(ctx context.Context, mangaDTO domain.UpdateMangaDTO) error
 	UploadChapter(ctx context.Context, chapter domain.Chapter) error
+	DeleteChapter(ctx context.Context, chapter domain.DeleteChapterDTO) error
 }
 
 type Preview interface {
