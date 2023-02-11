@@ -51,7 +51,6 @@ func UnzipUploadChapterArchive(uploadPath string, file *multipart.FileHeader) (i
 
 	chapterPageCounter := 0
 	for _, zipFile := range archiveReader.File {
-		fmt.Println("reading file:", zipFile.Name)
 		if !strings.Contains(chapterImageFormats, filepath.Ext(zipFile.Name)) {
 			continue
 		}
@@ -60,7 +59,6 @@ func UnzipUploadChapterArchive(uploadPath string, file *multipart.FileHeader) (i
 			continue
 		}
 		zipFile.Name = fmt.Sprintf("%v%v", chapterPageCounter, filepath.Ext(zipFile.Name))
-		fmt.Println("create file:", filepath.Join(uploadPath, zipFile.Name))
 		outputFile, err := os.Create(filepath.Join(uploadPath, zipFile.Name))
 		if err != nil {
 			return 0, err
