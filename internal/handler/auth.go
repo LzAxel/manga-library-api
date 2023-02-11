@@ -71,7 +71,7 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	token, err := h.services.Authorization.SignIn(ctx, userDTO)
 	if err != nil {
-		ErrorResponse(c, http.StatusInternalServerError, err.Error())
+		ErrorResponse(c, http.StatusNotFound, err.Error())
 		return
 	}
 
