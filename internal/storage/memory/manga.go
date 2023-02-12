@@ -132,3 +132,7 @@ func (m *MangaMemory) Update(ctx context.Context, mangaDTO domain.UpdateMangaDTO
 func (m *MangaMemory) UploadChapter(ctx context.Context, chapter domain.Chapter) error {
 	return nil
 }
+
+func (m *MangaMemory) DeleteChapter(ctx context.Context, chapter domain.DeleteChapterDTO) error {
+	return nil
+}

@@ -10,4 +10,11 @@ run: build
 	./cmd/app/main
 
 swag: 
-	swag init -g ./cmd/app/main.go -o ./docs
+	./tools/swag init -g ./cmd/app/main.go -o ./docs
+
+test:
+	./tools/gotest -v ./...
+
+gen-mock:
+	./tools/mockgen -source=internal/storage/storage.go \
+	-destination=internal/storage/mocks/mock_storage.go

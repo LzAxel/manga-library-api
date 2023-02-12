@@ -1,5 +1,20 @@
 basePath: /
 definitions:
+  domain.Chapter:
+    properties:
+      isPublished:
+        type: boolean
+      number:
+        type: integer
+      pageCount:
+        type: integer
+      uploadedAt:
+        type: string
+      uploaderId:
+        type: string
+      volume:
+        type: integer
+    type: object
   domain.CreateMangaDTO:
     properties:
       ageRating:
@@ -8,6 +23,8 @@ definitions:
         items:
           type: string
         type: array
+      author:
+        type: string
       description:
         type: string
       previewUrl:
@@ -22,6 +39,7 @@ definitions:
         type: string
     required:
     - ageRating
+    - author
     - description
     - previewUrl
     - releaseYear
@@ -58,10 +76,18 @@ definitions:
         items:
           type: string
         type: array
+      author:
+        type: string
+      chapters:
+        items:
+          $ref: '#/definitions/domain.Chapter'
+        type: array
       createdAt:
         type: string
       description:
         type: string
+      isPublished:
+        type: boolean
       likeCount:
         type: integer
       previewUrl:
@@ -87,8 +113,12 @@ definitions:
         items:
           type: string
         type: array
+      author:
+        type: string
       description:
         type: string
+      isPublished:
+        type: boolean
       previewUrl:
         type: string
       releaseYear:

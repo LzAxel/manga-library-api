@@ -284,10 +284,34 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "domain.Chapter": {
+            "type": "object",
+            "properties": {
+                "isPublished": {
+                    "type": "boolean"
+                },
+                "number": {
+                    "type": "integer"
+                },
+                "pageCount": {
+                    "type": "integer"
+                },
+                "uploadedAt": {
+                    "type": "string"
+                },
+                "uploaderId": {
+                    "type": "string"
+                },
+                "volume": {
+                    "type": "integer"
+                }
+            }
+        },
         "domain.CreateMangaDTO": {
             "type": "object",
             "required": [
                 "ageRating",
+                "author",
                 "description",
                 "previewUrl",
                 "releaseYear",
@@ -303,6 +327,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "author": {
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -369,11 +396,23 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "author": {
+                    "type": "string"
+                },
+                "chapters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Chapter"
+                    }
+                },
                 "createdAt": {
                     "type": "string"
                 },
                 "description": {
                     "type": "string"
+                },
+                "isPublished": {
+                    "type": "boolean"
                 },
                 "likeCount": {
                     "type": "integer"
@@ -413,8 +452,14 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "author": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
+                },
+                "isPublished": {
+                    "type": "boolean"
                 },
                 "previewUrl": {
                     "type": "string"
