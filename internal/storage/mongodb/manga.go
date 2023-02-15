@@ -79,6 +79,32 @@ func (m *MangaMongoDB) GetBySlug(ctx context.Context, mangaSlug string) (domain.
 	return manga, cur.Err()
 }
 
+func (m *MangaMongoDB) GetByTags(ctx context.Context, tags []string, offset int) ([]domain.Manga, error) {
+	var result []domain.Manga
+
+	coll := m.db.Collection(mangaCollection)
+	filter := bson.D{
+		{Key: "isPublished", Value: true},
+		{Key: "tags", Value: bson.D{
+			{Key: "$all", Value: tags},
+		}},
+	}
+
+	opts := options.Find().SetLimit(latestMangaLimit).
+		SetSort(bson.D{{Key: "createdAt", Value: -1}}).
+		SetSkip(int64(offset))
+
+	cur, err := coll.Find(ctx, filter, opts)
+	if err != nil {
+		return []domain.Manga{}, err
+	}
+	if err := cur.All(ctx, &result); err != nil {
+		return []domain.Manga{}, err
+	}
+
+	return result, nil
+}
+
 func (m *MangaMongoDB) Delete(ctx context.Context, mangaId string) error {
 
 	coll := m.db.Collection(mangaCollection)

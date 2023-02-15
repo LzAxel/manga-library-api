@@ -15,6 +15,7 @@ type Manga interface {
 
 	GetByID(ctx context.Context, id string) (domain.Manga, error)
 	GetBySlug(ctx context.Context, slug string) (domain.Manga, error)
+	GetByTags(ctx context.Context, tags []string, offset int) ([]domain.Manga, error)
 	Delete(ctx context.Context, userId string, mangaId string) error
 	Update(ctx context.Context, userId string, roles domain.Roles, mangaDTO domain.UpdateMangaDTO) error
 	UploadChapter(ctx context.Context, chapterDTO domain.UploadChapterDTO, roles domain.Roles) error

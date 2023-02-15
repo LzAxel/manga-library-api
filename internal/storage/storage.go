@@ -15,6 +15,7 @@ type Manga interface {
 	GetLatest(ctx context.Context) ([]domain.Manga, error)
 	GetById(ctx context.Context, mangaId string) (domain.Manga, error)
 	GetBySlug(ctx context.Context, mangaSlug string) (domain.Manga, error)
+	GetByTags(ctx context.Context, tags []string, offset int) ([]domain.Manga, error)
 	Delete(ctx context.Context, mangaId string) error
 	Update(ctx context.Context, mangaDTO domain.UpdateMangaDTO) error
 	UploadChapter(ctx context.Context, chapter domain.Chapter) error
@@ -58,7 +59,6 @@ func NewStorage(db *mongo.Database, logger logger.Logger) *Storage {
 func NewInMemoryStorage(logger logger.Logger) *Storage {
 	return &Storage{
 		logger:        logger,
-		Manga:         memory.NewMangaMemory(logger),
 		Preview:       memory.NewPreviewMemory(logger),
 		Authorization: memory.NewAuthMemory(logger),
 	}

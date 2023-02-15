@@ -110,6 +110,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/manga/filter": {
+            "get": {
+                "tags": [
+                    "Manga"
+                ],
+                "summary": "Get Manga by tags",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tags",
+                        "name": "tags",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Manga"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input (Invalid offset)"
+                    },
+                    "404": {
+                        "description": "Manga not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/manga/latest": {
             "get": {
                 "tags": [

@@ -40,6 +40,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			manga.GET("/latest", h.getLatestManga)
 			manga.GET("", h.getManga)
+			manga.GET("/filter", h.getMangaByFilter)
 			manga.POST("/", h.userIdentity, h.createManga)
 			manga.DELETE("/:id", h.userIdentity, h.deleteManga)
 			manga.PATCH("/:id", h.userIdentity, h.updateManga)

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"manga-library/internal/domain"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -85,12 +87,8 @@ func (h *Handler) getManga(c *gin.Context) {
 
 	h.logger.WithFields(logrus.Fields{"id": id, "slug": slug}).Debugln("getting manga")
 
-	if slug == "" && id == "" {
-		ErrorResponse(c, http.StatusBadRequest, "slug and id params are empty")
-		return
-	}
-	if slug != "" && id != "" {
-		ErrorResponse(c, http.StatusBadRequest, "allowed only one of params: id, slug")
+	if (slug != "" && id != "") || (slug == "" && id == "") {
+		ErrorResponse(c, http.StatusBadRequest, "invalid input")
 		return
 	}
 
@@ -107,6 +105,50 @@ func (h *Handler) getManga(c *gin.Context) {
 		}
 		h.logger.Errorln(err)
 		ErrorResponse(c, http.StatusInternalServerError, "failed to getting manga")
+		return
+	}
+
+	c.JSON(http.StatusOK, manga)
+}
+
+// Get Manga By Tags
+// @Summary Get Manga by tags
+// @Tags Manga
+// @Success 200 {object} []domain.Manga
+// @Failure 400 "Invalid input (Invalid offset)"
+// @Failure 404 "Manga not found"
+// @Failure 500
+// @Param tags query string true "Tags"
+// @Param offset query string false "Offset"
+// @Router /api/manga/filter [get]
+func (h *Handler) getMangaByFilter(c *gin.Context) {
+	var offsetInt int
+	var err error
+
+	tags := c.Query("tags")
+	offset := c.Query("offset")
+
+	h.logger.WithFields(logrus.Fields{"tags": tags}).Debugln("getting manga by filter")
+
+	tagList := strings.Split(tags, ",")
+	if offset == "" {
+		offsetInt = 0
+	} else {
+		offsetInt, err = strconv.Atoi(offset)
+		if err != nil {
+			ErrorResponse(c, http.StatusBadRequest, "invalid offset")
+			return
+		}
+	}
+
+	manga, err := h.services.Manga.GetByTags(c, tagList, offsetInt)
+	if err != nil {
+		h.logger.Errorln(err)
+		ErrorResponse(c, http.StatusInternalServerError, "failed to getting manga by filter")
+		return
+	}
+	if manga == nil {
+		ErrorResponse(c, http.StatusNotFound, domain.ErrNotFound.Error())
 		return
 	}
 

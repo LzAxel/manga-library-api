@@ -243,6 +243,34 @@ paths:
       summary: Update Manga by ID
       tags:
       - Manga
+  /api/manga/filter:
+    get:
+      parameters:
+      - description: Tags
+        in: query
+        name: tags
+        required: true
+        type: string
+      - description: Offset
+        in: query
+        name: offset
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Manga'
+            type: array
+        "400":
+          description: Invalid input (Invalid offset)
+        "404":
+          description: Manga not found
+        "500":
+          description: Internal Server Error
+      summary: Get Manga by tags
+      tags:
+      - Manga
   /api/manga/latest:
     get:
       responses:

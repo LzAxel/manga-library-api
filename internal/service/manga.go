@@ -5,6 +5,7 @@ import (
 	"manga-library/internal/domain"
 	"manga-library/internal/storage"
 	"manga-library/pkg/logger"
+	"strings"
 	"time"
 
 	"github.com/gosimple/slug"
@@ -22,6 +23,9 @@ func NewMangaService(storage storage.Manga, logger logger.Logger) *MangaService 
 }
 
 func (s *MangaService) Create(ctx context.Context, userId string, mangaDTO domain.CreateMangaDTO) (string, error) {
+	for idx, tag := range mangaDTO.Tags {
+		mangaDTO.Tags[idx] = strings.ToLower(tag)
+	}
 	manga := domain.Manga{
 		ID:                uuid.NewString(),
 		Title:             mangaDTO.Title,
@@ -53,6 +57,14 @@ func (s *MangaService) GetByID(ctx context.Context, id string) (domain.Manga, er
 
 func (s *MangaService) GetBySlug(ctx context.Context, slug string) (domain.Manga, error) {
 	return s.storage.GetBySlug(ctx, slug)
+}
+
+func (s *MangaService) GetByTags(ctx context.Context, tags []string, offset int) ([]domain.Manga, error) {
+	for idx, tag := range tags {
+		tags[idx] = strings.ToLower(tag)
+	}
+	s.logger.Debugln(tags)
+	return s.storage.GetByTags(ctx, tags, offset)
 }
 
 func (s *MangaService) Delete(ctx context.Context, userId string, mangaId string) error {
