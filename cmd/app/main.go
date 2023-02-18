@@ -29,7 +29,7 @@ const configPath = "configs/config.yaml"
 // @Name Authorization
 
 func main() {
-	cfg := config.GetYAMLConfig(configPath)
+	cfg := config.GetEnvConfig()
 	if cfg.IsProd {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -45,10 +45,7 @@ func main() {
 	mongodb := mongodb.NewMongoDB(cfg.DBConfig.Host, cfg.DBConfig.Port, cfg.DBConfig.Username, cfg.DBConfig.Password, cfg.DBConfig.DBName)
 	l.Infoln("db connected successfully")
 
-	// TODO: set logger as first argument for layers
-
 	jwtManager := jwt.NewJWTManager(cfg.JWT.Secret, cfg.JWT.TokenTTL)
-	// storage := storage.NewInMemoryStorage(l)
 	storage := storage.NewStorage(mongodb, l)
 	service := service.NewService(storage, jwtManager, l, adminUser)
 	handler := handler.NewHandler(service, l)
