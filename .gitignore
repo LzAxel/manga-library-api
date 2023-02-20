@@ -3,3 +3,5 @@ _*
 configs/*
 !configs/local.yaml
 upload
+.*
+!.env.example
