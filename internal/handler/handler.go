@@ -62,10 +62,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			user.DELETE("/:id", h.deleteUser)
 		}
 	}
-	router.GET("/docs", func(ctx *gin.Context) {
-		ctx.Redirect(http.StatusPermanentRedirect, "/swagger/index.html")
+	router.GET("/api/docs", func(ctx *gin.Context) {
+		ctx.Redirect(http.StatusPermanentRedirect, "/api/swagger/index.html")
 	})
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/api/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }
