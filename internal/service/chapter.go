@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	uploadMangaPath     = "./upload/"
+	uploadMangaPath     = "./files/manga/"
 	chapterImageFormats = ".jpg .jpeg"
 )
 

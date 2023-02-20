@@ -21,8 +21,8 @@ import (
 )
 
 const (
-	previewUploadDir = `.\upload\preview\`
-	previewUrlBase   = `preview/`
+	previewUploadDir = `.\files\preview\`
+	previewUrlBase   = `files/`
 	imageFormats     = "png jpeg jpg"
 )
 
