@@ -41,7 +41,7 @@ func GetEnvConfig() *Config {
 
 	config := &Config{}
 	if err := cleanenv.ReadEnv(config); err != nil {
-		configHeaderText := "Note System"
+		configHeaderText := "Manga Library"
 		helpText, _ := cleanenv.GetDescription(config, &configHeaderText)
 		log.Println(helpText)
 		log.Fatal(err)
@@ -55,7 +55,7 @@ func GetYAMLConfig(configPath string) *Config {
 
 	config := &Config{}
 	if err := cleanenv.ReadConfig(configPath, config); err != nil {
-		configHeaderText := "Note System"
+		configHeaderText := "Manga Library"
 		helpText, _ := cleanenv.GetDescription(config, &configHeaderText)
 		log.Println(helpText)
 		log.Fatal(err)
