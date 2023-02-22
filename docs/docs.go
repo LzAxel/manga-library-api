@@ -16,6 +16,139 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/chapter/": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "Chapter"
+                ],
+                "summary": "Upload Chapter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "mangaSlug",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "number",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "volume",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Chapter archive (only .zip)",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/chapter/{slug}/{volume}/{number}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "Chapter"
+                ],
+                "summary": "Delete Chapter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "mangaSlug",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "number",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "volume",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Chapter archive (only .zip)",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Manga Slug",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Chapter Volume",
+                        "name": "volume",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Chapter Number",
+                        "name": "number",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/heartbeat": {
             "get": {
                 "tags": [
@@ -69,7 +202,9 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 }
-            },
+            }
+        },
+        "/api/manga/": {
             "post": {
                 "security": [
                     {
@@ -77,7 +212,7 @@ const docTemplate = `{
                     }
                 ],
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "tags": [
                     "Manga"
@@ -85,13 +220,54 @@ const docTemplate = `{
                 "summary": "Create Manga",
                 "parameters": [
                     {
-                        "description": "Add manga",
-                        "name": "manga",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/domain.CreateMangaDTO"
-                        }
+                        "type": "integer",
+                        "name": "ageRating",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "title1,title2,title3 (separate by comma)",
+                        "name": "alternativeTitles",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "author",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "releaseYear",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "tag1,tag2,tag3 (separate by comma)",
+                        "name": "tags",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Manga preview image (jpg, jpeg)",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -214,7 +390,7 @@ const docTemplate = `{
                     }
                 ],
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "tags": [
                     "Manga"
@@ -222,13 +398,52 @@ const docTemplate = `{
                 "summary": "Update Manga by ID",
                 "parameters": [
                     {
-                        "description": "Update manga",
-                        "name": "manga",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/domain.UpdateMangaDTO"
-                        }
+                        "type": "integer",
+                        "name": "ageRating",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "title1,title2,title3 (separate by comma)",
+                        "name": "alternativeTitles",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "author",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "name": "isPublished",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "releaseYear",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "tag1,tag2,tag3 (separate by comma)",
+                        "name": "tags",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Manga preview image (jpg, jpeg)",
+                        "name": "preview",
+                        "in": "formData"
                     },
                     {
                         "type": "string",
@@ -350,50 +565,6 @@ const docTemplate = `{
                 }
             }
         },
-        "domain.CreateMangaDTO": {
-            "type": "object",
-            "required": [
-                "ageRating",
-                "author",
-                "description",
-                "previewUrl",
-                "releaseYear",
-                "tags",
-                "title"
-            ],
-            "properties": {
-                "ageRating": {
-                    "type": "integer"
-                },
-                "alternativeTitles": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "author": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "previewUrl": {
-                    "type": "string"
-                },
-                "releaseYear": {
-                    "type": "integer"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
         "domain.CreateUserDTO": {
             "type": "object",
             "required": [
@@ -479,44 +650,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "uploaderId": {
-                    "type": "string"
-                }
-            }
-        },
-        "domain.UpdateMangaDTO": {
-            "type": "object",
-            "properties": {
-                "ageRating": {
-                    "type": "integer"
-                },
-                "alternativeTitles": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "author": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "isPublished": {
-                    "type": "boolean"
-                },
-                "previewUrl": {
-                    "type": "string"
-                },
-                "releaseYear": {
-                    "type": "integer"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
                     "type": "string"
                 }
             }

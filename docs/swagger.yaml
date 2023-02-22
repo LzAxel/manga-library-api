@@ -15,37 +15,6 @@ definitions:
       volume:
         type: integer
     type: object
-  domain.CreateMangaDTO:
-    properties:
-      ageRating:
-        type: integer
-      alternativeTitles:
-        items:
-          type: string
-        type: array
-      author:
-        type: string
-      description:
-        type: string
-      previewUrl:
-        type: string
-      releaseYear:
-        type: integer
-      tags:
-        items:
-          type: string
-        type: array
-      title:
-        type: string
-    required:
-    - ageRating
-    - author
-    - description
-    - previewUrl
-    - releaseYear
-    - tags
-    - title
-    type: object
   domain.CreateUserDTO:
     properties:
       password:
@@ -105,31 +74,6 @@ definitions:
       uploaderId:
         type: string
     type: object
-  domain.UpdateMangaDTO:
-    properties:
-      ageRating:
-        type: integer
-      alternativeTitles:
-        items:
-          type: string
-        type: array
-      author:
-        type: string
-      description:
-        type: string
-      isPublished:
-        type: boolean
-      previewUrl:
-        type: string
-      releaseYear:
-        type: integer
-      tags:
-        items:
-          type: string
-        type: array
-      title:
-        type: string
-    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -137,6 +81,93 @@ info:
   title: Manga Library API
   version: "1.0"
 paths:
+  /api/chapter/:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - in: formData
+        name: mangaSlug
+        required: true
+        type: string
+      - in: formData
+        minimum: 0
+        name: number
+        required: true
+        type: integer
+      - in: formData
+        minimum: 0
+        name: volume
+        required: true
+        type: integer
+      - description: Chapter archive (only .zip)
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Upload Chapter
+      tags:
+      - Chapter
+  /api/chapter/{slug}/{volume}/{number}:
+    delete:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - in: formData
+        name: mangaSlug
+        required: true
+        type: string
+      - in: formData
+        minimum: 0
+        name: number
+        required: true
+        type: integer
+      - in: formData
+        minimum: 0
+        name: volume
+        required: true
+        type: integer
+      - description: Chapter archive (only .zip)
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Manga Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Chapter Volume
+        in: path
+        name: volume
+        required: true
+        type: integer
+      - description: Chapter Number
+        in: path
+        name: number
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Delete Chapter
+      tags:
+      - Chapter
   /api/heartbeat:
     get:
       responses:
@@ -172,16 +203,45 @@ paths:
       summary: Get Manga by ID or Slug
       tags:
       - Manga
+  /api/manga/:
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       parameters:
-      - description: Add manga
-        in: body
-        name: manga
+      - in: formData
+        name: ageRating
         required: true
-        schema:
-          $ref: '#/definitions/domain.CreateMangaDTO'
+        type: integer
+      - example: title1,title2,title3 (separate by comma)
+        in: formData
+        name: alternativeTitles
+        type: string
+      - in: formData
+        name: author
+        required: true
+        type: string
+      - in: formData
+        name: description
+        required: true
+        type: string
+      - in: formData
+        name: releaseYear
+        required: true
+        type: integer
+      - example: tag1,tag2,tag3 (separate by comma)
+        in: formData
+        name: tags
+        required: true
+        type: string
+      - in: formData
+        name: title
+        required: true
+        type: string
+      - description: Manga preview image (jpg, jpeg)
+        in: formData
+        name: file
+        required: true
+        type: file
       responses:
         "200":
           description: Created manga ID
@@ -218,14 +278,38 @@ paths:
       - Manga
     patch:
       consumes:
-      - application/json
+      - multipart/form-data
       parameters:
-      - description: Update manga
-        in: body
-        name: manga
-        required: true
-        schema:
-          $ref: '#/definitions/domain.UpdateMangaDTO'
+      - in: formData
+        name: ageRating
+        type: integer
+      - example: title1,title2,title3 (separate by comma)
+        in: formData
+        name: alternativeTitles
+        type: string
+      - in: formData
+        name: author
+        type: string
+      - in: formData
+        name: description
+        type: string
+      - in: formData
+        name: isPublished
+        type: boolean
+      - in: formData
+        name: releaseYear
+        type: integer
+      - example: tag1,tag2,tag3 (separate by comma)
+        in: formData
+        name: tags
+        type: string
+      - in: formData
+        name: title
+        type: string
+      - description: Manga preview image (jpg, jpeg)
+        in: formData
+        name: preview
+        type: file
       - description: Manga ID
         in: path
         name: id
