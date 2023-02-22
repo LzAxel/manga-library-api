@@ -1,7 +1,7 @@
-main
 _*
-configs/*
-!configs/local.yaml
-upload
 .*
 !.env.example
+configs/*
+!configs/local.yaml
+main
+files
