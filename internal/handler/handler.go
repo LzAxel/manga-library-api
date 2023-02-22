@@ -45,11 +45,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			manga.DELETE("/:id", h.userIdentity, h.deleteManga)
 			manga.PATCH("/:id", h.userIdentity, h.updateManga)
 		}
-		upload := api.Group("/upload", h.userIdentity)
-		{
-			upload.POST("/preview", h.uploadMangaPreview)
-			upload.DELETE("/preview/:id", h.deleteMangaPreview)
-		}
 		chapter := api.Group("/chapter")
 		{
 			chapter.POST("/", h.userIdentity, h.uploadChapter)

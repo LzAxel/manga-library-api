@@ -22,11 +22,6 @@ type Manga interface {
 	DeleteChapter(ctx context.Context, chapter domain.DeleteChapterDTO) error
 }
 
-type Preview interface {
-	Create(ctx context.Context, preview domain.Preview) (string, error)
-	Delete(ctx context.Context, previewId string) error
-}
-
 type User interface {
 	GetByID(ctx context.Context, userID string) (domain.User, error)
 	GetByUsername(ctx context.Context, username string) (domain.User, error)
@@ -39,7 +34,6 @@ type Authorization interface {
 
 type Storage struct {
 	Manga
-	Preview
 	Authorization
 	User
 
@@ -50,7 +44,6 @@ func NewStorage(db *mongo.Database, logger logger.Logger) *Storage {
 	return &Storage{
 		logger:        logger,
 		Manga:         mongodb.NewMangaMongoDB(db),
-		Preview:       mongodb.NewPreviewMongoDB(db),
 		Authorization: mongodb.NewAuthorizationMongoDB(logger, db),
 		User:          mongodb.NewUserMongoDB(db),
 	}
@@ -59,7 +52,6 @@ func NewStorage(db *mongo.Database, logger logger.Logger) *Storage {
 func NewInMemoryStorage(logger logger.Logger) *Storage {
 	return &Storage{
 		logger:        logger,
-		Preview:       memory.NewPreviewMemory(logger),
 		Authorization: memory.NewAuthMemory(logger),
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"manga-library/internal/storage"
 	"manga-library/pkg/jwt"
 	"manga-library/pkg/logger"
-	"mime/multipart"
 )
 
 type Manga interface {
@@ -22,11 +21,6 @@ type Manga interface {
 	DeleteChapter(ctx context.Context, chapterDTO domain.DeleteChapterDTO, roles domain.Roles) error
 }
 
-type Preview interface {
-	Create(ctx context.Context, file multipart.File, filename string, uploaderId string) (string, error)
-	Delete(ctx context.Context, previewId string) error
-}
-
 type User interface {
 	GetByID(ctx context.Context, userID string) (domain.User, error)
 	GetByUsername(ctx context.Context, username string) (domain.User, error)
@@ -39,7 +33,6 @@ type Authorization interface {
 
 type Service struct {
 	Manga
-	Preview
 	Authorization
 	User
 
@@ -57,7 +50,6 @@ func NewService(storage *storage.Storage, JWTManager *jwt.JWTManager,
 		JWTMangaer:    JWTManager,
 		logger:        logger,
 		Manga:         NewMangaService(storage.Manga, logger),
-		Preview:       NewPreviewService(storage.Preview, logger),
 		Authorization: NewAuthorizationService(storage.Authorization, logger, JWTManager, adminUser),
 		User:          NewUserService(storage.User, logger),
 	}
