@@ -12,6 +12,17 @@ import (
 
 const zipExtansion = ".zip"
 
+// Upload Chapter
+// @Summary Upload Chapter
+// @Security BearerAuth
+// @Accept mpfd
+// @Tags Chapter
+// @Success 200
+// @Failure 400
+// @Failure 500
+// @Param file formData domain.UploadChapterDTO true "request"
+// @Param file formData file true "Chapter archive (only .zip)"
+// @Router /api/chapter/ [post]
 func (h *Handler) uploadChapter(ctx *gin.Context) {
 	h.logger.Debugln("uploading chapter")
 	var chapterDTO domain.UploadChapterDTO
@@ -45,6 +56,20 @@ func (h *Handler) uploadChapter(ctx *gin.Context) {
 	}
 }
 
+// Delete Chapter
+// @Summary Delete Chapter
+// @Security BearerAuth
+// @Accept mpfd
+// @Tags Chapter
+// @Success 200
+// @Failure 400
+// @Failure 500
+// @Param file formData domain.UploadChapterDTO true "request"
+// @Param file formData file true "Chapter archive (only .zip)"
+// @Param slug path string true "Manga Slug"
+// @Param volume path int true "Chapter Volume"
+// @Param number path int true "Chapter Number"
+// @Router /api/chapter/{slug}/{volume}/{number} [delete]
 func (h *Handler) deleteChapter(ctx *gin.Context) {
 	h.logger.Debugln("deleting chapter")
 	uploaderID, err := h.getUserId(ctx)

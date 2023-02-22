@@ -8,20 +8,23 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/sirupsen/logrus"
 )
 
 // Create Manga
 // @Summary Create Manga
 // @Tags Manga
-// @Accept json
+// @Accept mpfd
 // @Security BearerAuth
-// @Param manga body domain.CreateMangaDTO true "Add manga"
+// @Param file formData domain.CreateMangaRawDTO true "request"
+// @Param file formData file true "Manga preview image (jpg, jpeg)"
 // @Success 200 {object} string "Created manga ID"
 // @Failure 400 "Invalid input"
 // @Failure 500
-// @Router /api/manga [post]
+// @Router /api/manga/ [post]
 func (h *Handler) createManga(c *gin.Context) {
+	var mangaRawDTO domain.CreateMangaRawDTO
 	var mangaDTO domain.CreateMangaDTO
 
 	userId, err := h.getUserId(c)
@@ -32,11 +35,12 @@ func (h *Handler) createManga(c *gin.Context) {
 	}
 	h.logger.WithFields(logrus.Fields{"userId": userId}).Debugln("creating manga")
 
-	if err := c.BindJSON(&mangaDTO); err != nil {
+	if err := c.ShouldBindWith(&mangaRawDTO, binding.FormMultipart); err != nil {
 		h.logger.Errorln(err)
 		ErrorResponse(c, http.StatusBadRequest, "invalid input")
 		return
 	}
+	mangaDTO = mangaRawDTO.Validate()
 
 	id, err := h.services.Manga.Create(c, userId, mangaDTO)
 	if err != nil {
@@ -188,17 +192,19 @@ func (h *Handler) deleteManga(c *gin.Context) {
 // Update Manga
 // @Summary Update Manga by ID
 // @Security BearerAuth
-// @Accept json
+// @Accept mpfd
 // @Tags Manga
 // @Success 200
 // @Failure 400
 // @Failure 500
-// @Param manga body domain.UpdateMangaDTO true "Update manga"
+// @Param file formData domain.UpdateMangaRawDTO true "request"
+// @Param preview formData file false "Manga preview image (jpg, jpeg)"
 // @Param id path string true "Manga ID"
 // @Router /api/manga/{id} [patch]
 func (h *Handler) updateManga(c *gin.Context) {
 	h.logger.Debugln("updating manga")
 	var mangaId = c.Param("id")
+	var mangaRawDTO domain.UpdateMangaRawDTO
 	var mangaDTO domain.UpdateMangaDTO
 
 	userId, err := h.getUserId(c)
@@ -215,11 +221,13 @@ func (h *Handler) updateManga(c *gin.Context) {
 		return
 	}
 
-	if err := c.BindJSON(&mangaDTO); err != nil {
+	if err := c.ShouldBindWith(&mangaRawDTO, binding.FormMultipart); err != nil {
 		h.logger.Errorln(err)
 		ErrorResponse(c, http.StatusBadRequest, "invalid input")
 		return
 	}
+	mangaDTO = mangaRawDTO.Validate()
+
 	mangaDTO.ID = mangaId
 	err = h.services.Manga.Update(c, userId, roles, mangaDTO)
 	if err != nil {

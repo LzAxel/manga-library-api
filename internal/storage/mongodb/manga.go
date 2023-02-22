@@ -134,9 +134,6 @@ func (m *MangaMongoDB) Update(ctx context.Context, mangaDTO domain.UpdateMangaDT
 	if mangaDTO.Tags != nil {
 		setQuery = append(setQuery, bson.E{Key: "tags", Value: &mangaDTO.Tags})
 	}
-	if mangaDTO.PreviewURL != nil {
-		setQuery = append(setQuery, bson.E{Key: "previewUrl", Value: &mangaDTO.PreviewURL})
-	}
 	if mangaDTO.AgeRating != nil {
 		setQuery = append(setQuery, bson.E{Key: "ageRating", Value: &mangaDTO.AgeRating})
 	}
@@ -150,6 +147,9 @@ func (m *MangaMongoDB) Update(ctx context.Context, mangaDTO domain.UpdateMangaDT
 		setQuery = append(setQuery, bson.E{Key: "author", Value: &mangaDTO.Author})
 	}
 
+	if setQuery == nil {
+		return nil
+	}
 	result, err := coll.UpdateByID(ctx, mangaDTO.ID, bson.D{{Key: "$set", Value: setQuery}})
 	if err != nil {
 		return err

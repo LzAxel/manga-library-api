@@ -15,8 +15,7 @@ import (
 )
 
 const (
-	uploadMangaPath     = "./files/manga/"
-	chapterImageFormats = ".jpg .jpeg"
+	imageFormats = ".jpg .jpeg"
 )
 
 func (s *MangaService) UploadChapter(ctx context.Context, chapterDTO domain.UploadChapterDTO, roles domain.Roles) error {
