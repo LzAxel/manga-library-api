@@ -141,6 +141,7 @@ type UpdateMangaDTO struct {
 	Description       *string
 	Tags              *[]string
 	Preview           *multipart.FileHeader
+	PreviewUrl        *string
 	AgeRating         *int
 	ReleaseYear       *int
 	IsPublished       *bool

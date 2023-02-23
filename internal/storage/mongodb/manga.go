@@ -124,6 +124,7 @@ func (m *MangaMongoDB) Update(ctx context.Context, mangaDTO domain.UpdateMangaDT
 	if mangaDTO.Title != nil {
 		setQuery = append(setQuery, bson.E{Key: "title", Value: &mangaDTO.Title})
 		setQuery = append(setQuery, bson.E{Key: "slug", Value: mangaDTO.Slug})
+		setQuery = append(setQuery, bson.E{Key: "previewUrl", Value: mangaDTO.Slug})
 	}
 	if mangaDTO.AlternativeTitles != nil {
 		setQuery = append(setQuery, bson.E{Key: "alternativeTitles", Value: &mangaDTO.AlternativeTitles})

@@ -8,6 +8,7 @@ import (
 	"manga-library/pkg/image"
 	"manga-library/pkg/logger"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -137,6 +138,13 @@ func (s *MangaService) Update(ctx context.Context, userId string, roles domain.R
 
 	if mangaDTO.Title != nil {
 		mangaDTO.Slug = slug.Make(*mangaDTO.Title)
+		newPreviewUrl := path.Join(uploadUrl, mangaDTO.Slug, "preview.jpeg")
+		mangaDTO.PreviewUrl = &newPreviewUrl
+
+		if err := os.Rename(filepath.Join(uploadMangaPath, manga.Slug), filepath.Join(uploadMangaPath, mangaDTO.Slug)); err != nil {
+			return err
+		}
+
 	}
 
 	if err := s.storage.Update(ctx, mangaDTO); err != nil {
