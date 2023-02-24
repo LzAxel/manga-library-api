@@ -96,12 +96,15 @@ func (s *MangaService) GetBySlug(ctx context.Context, slug string) (domain.Manga
 	return s.storage.GetBySlug(ctx, slug)
 }
 
-func (s *MangaService) GetByTags(ctx context.Context, tags []string, offset int) ([]domain.Manga, error) {
-	for idx, tag := range tags {
-		tags[idx] = strings.ToLower(tag)
+func (s *MangaService) GetByFilter(ctx context.Context, filter domain.MangaFilter) ([]domain.Manga, error) {
+	if filter.Tags != nil {
+		for idx, tag := range filter.Tags {
+			filter.Tags[idx] = strings.ToLower(tag)
+		}
 	}
-	s.logger.Debugln(tags)
-	return s.storage.GetByTags(ctx, tags, offset)
+
+	s.logger.Debugln(filter.Tags)
+	return s.storage.GetByFilter(ctx, filter)
 }
 
 func (s *MangaService) Delete(ctx context.Context, userId string, mangaId string) error {

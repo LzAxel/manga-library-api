@@ -2,15 +2,21 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 	"mime/multipart"
 	"strings"
 	"time"
+)
+
+const (
+	orderByValues = "date releaseDate"
 )
 
 var (
 	ErrMangaTitleExists   = errors.New("manga title already exists")
 	ErrFailedToGet        = errors.New("failed to get manga")
 	ErrMangaPublishByUser = errors.New("only admin user can publish manga")
+	ErrInvalidFilter      = errors.New("invalid filter")
 )
 
 type Manga struct {
@@ -111,22 +117,12 @@ func (m *UpdateMangaRawDTO) Validate() UpdateMangaDTO {
 	}
 
 	if m.Tags != nil {
-		var tags = make([]string, 0)
-		for _, tag := range strings.Split(*m.Tags, ",") {
-			if len(tag) > 0 {
-				tags = append(tags, tag)
-			}
-		}
+		tags := parseStringToArray(*m.Tags)
 		mangaDTO.Tags = &tags
 	}
 
 	if m.AlternativeTitles != nil {
-		var altTitles = make([]string, 0)
-		for _, altTitle := range strings.Split(*m.AlternativeTitles, ",") {
-			if len(altTitle) > 0 {
-				altTitles = append(altTitles, altTitle)
-			}
-		}
+		altTitles := parseStringToArray(*m.AlternativeTitles)
 		mangaDTO.AlternativeTitles = &altTitles
 	}
 
@@ -146,4 +142,49 @@ type UpdateMangaDTO struct {
 	ReleaseYear       *int
 	IsPublished       *bool
 	Slug              string
+}
+
+type RawMangaFilter struct {
+	Offset      *int    `form:"offset,default=0"`
+	OrderBy     *string `form:"orderBy,default=date"`
+	Tags        *string `form:"tags"`
+	IsPublished *bool   `form:"isPublished,default=true"`
+}
+
+func (f *RawMangaFilter) Validate() (MangaFilter, error) {
+	var filter = MangaFilter{
+		Offset:      *f.Offset,
+		OrderBy:     *f.OrderBy,
+		IsPublished: *f.IsPublished,
+	}
+
+	if f.Tags != nil {
+		tags := parseStringToArray(*f.Tags)
+		filter.Tags = tags
+	}
+	if f.OrderBy != nil {
+		if !strings.Contains(orderByValues, *f.OrderBy) {
+			return filter, fmt.Errorf("%v: orderBy can be: %v", ErrInvalidFilter.Error(), orderByValues)
+		}
+	}
+
+	return filter, nil
+}
+
+type MangaFilter struct {
+	Offset      int
+	OrderBy     string
+	Tags        []string
+	IsPublished bool
+}
+
+func parseStringToArray(rawString string) []string {
+	var array = make([]string, 0)
+	for _, tag := range strings.Split(rawString, ",") {
+		if len(tag) > 0 {
+			array = append(array, tag)
+		}
+	}
+
+	return array
 }

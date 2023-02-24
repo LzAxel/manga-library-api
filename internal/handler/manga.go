@@ -4,8 +4,6 @@ import (
 	"errors"
 	"manga-library/internal/domain"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -126,26 +124,48 @@ func (h *Handler) getManga(c *gin.Context) {
 // @Param offset query string false "Offset"
 // @Router /api/manga/filter [get]
 func (h *Handler) getMangaByFilter(c *gin.Context) {
-	var offsetInt int
-	var err error
+	var (
+		rawFilter domain.RawMangaFilter
+		filter    domain.MangaFilter
+		err       error
+	)
 
-	tags := c.Query("tags")
-	offset := c.Query("offset")
+	h.logger.Debugln("getting manga by filter")
 
-	h.logger.WithFields(logrus.Fields{"tags": tags}).Debugln("getting manga by filter")
+	if err = c.ShouldBindQuery(&rawFilter); err != nil {
+		ErrorResponse(c, http.StatusBadRequest, domain.ErrInvalidFilter.Error())
+		return
+	}
+	filter, err = rawFilter.Validate()
+	if err != nil {
+		ErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
-	tagList := strings.Split(tags, ",")
-	if offset == "" {
-		offsetInt = 0
-	} else {
-		offsetInt, err = strconv.Atoi(offset)
-		if err != nil {
-			ErrorResponse(c, http.StatusBadRequest, "invalid offset")
+	h.logger.Debugf("%v %v %v %v", filter.Offset, filter.OrderBy,
+		filter.Tags, filter.IsPublished)
+
+	// TODO: make something with kostb|l'
+	if !filter.IsPublished {
+		h.userIdentity(c)
+		userId, err := h.getUserId(c)
+		if err == nil {
+			roles, err := h.getUserRoles(c, userId)
+			if err != nil {
+				return
+			}
+			if roles.IsAdmin && !filter.IsPublished {
+				filter.IsPublished = false
+			} else {
+				filter.IsPublished = true
+			}
+
+		} else {
 			return
 		}
 	}
 
-	manga, err := h.services.Manga.GetByTags(c, tagList, offsetInt)
+	manga, err := h.services.Manga.GetByFilter(c, filter)
 	if err != nil {
 		h.logger.Errorln(err)
 		ErrorResponse(c, http.StatusInternalServerError, "failed to getting manga by filter")

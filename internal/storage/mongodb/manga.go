@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"manga-library/internal/domain"
 
@@ -79,22 +80,34 @@ func (m *MangaMongoDB) GetBySlug(ctx context.Context, mangaSlug string) (domain.
 	return manga, cur.Err()
 }
 
-func (m *MangaMongoDB) GetByTags(ctx context.Context, tags []string, offset int) ([]domain.Manga, error) {
-	var result []domain.Manga
+func (m *MangaMongoDB) GetByFilter(ctx context.Context, filter domain.MangaFilter) ([]domain.Manga, error) {
+	var (
+		result      []domain.Manga
+		filterQuery = bson.D{}
+	)
 
 	coll := m.db.Collection(mangaCollection)
-	filter := bson.D{
-		{Key: "isPublished", Value: true},
-		{Key: "tags", Value: bson.D{
-			{Key: "$all", Value: tags},
-		}},
+	filterQuery = bson.D{
+		{Key: "isPublished", Value: filter.IsPublished},
 	}
 
-	opts := options.Find().SetLimit(latestMangaLimit).
-		SetSort(bson.D{{Key: "createdAt", Value: -1}}).
-		SetSkip(int64(offset))
+	if filter.Tags != nil {
+		filterQuery = append(filterQuery,
+			bson.E{Key: "tags", Value: bson.D{
+				{Key: "$all", Value: filter.Tags},
+			}})
+	}
+	fmt.Println(filterQuery)
+	// TODO: make match for orderBy and add invertion
+	opts := options.Find().SetLimit(latestMangaLimit).SetSkip(int64(filter.Offset))
+	switch filter.OrderBy {
+	case "date":
+		opts.SetSort(bson.D{{Key: "createdAt", Value: -1}})
+	case "releaseDate":
+		opts.SetSort(bson.D{{Key: "releaseYear", Value: -1}})
+	}
 
-	cur, err := coll.Find(ctx, filter, opts)
+	cur, err := coll.Find(ctx, filterQuery, opts)
 	if err != nil {
 		return []domain.Manga{}, err
 	}
