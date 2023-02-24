@@ -26,16 +26,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 	router.MaxMultipartMemory = 6
 
-	auth := router.Group("/auth")
-	{
-		auth.POST("/sign-in", h.signIn)
-		auth.POST("/sign-up", h.signUp)
-	}
-
 	api := router.Group("/api")
 	{
 		api.GET("/heartbeat", h.heartbeat)
 
+		auth := api.Group("/auth")
+		{
+			auth.POST("/sign-in", h.signIn)
+			auth.POST("/sign-up", h.signUp)
+		}
 		manga := api.Group("/manga")
 		{
 			manga.GET("/latest", h.getLatestManga)

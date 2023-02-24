@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  api:
+    build: .
+    command: ./cmd/app/main
+    depends_on:
+      - mongodb
+    links:
+      - "mongodb:mongodb"
+    env_file:
+      - .env
+    volumes:
+      - "./files:/usr/src/app/files"
+
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - 80:80
+    expose:
+      - 80
+    links:
+      - api:backend
+    volumes:
+      - "./docker/nginx:/etc/nginx/"
+      - "./files:/var/www/files"
+
+  mongodb:
+    restart: always
+    image: mongo:4.4.6
+    ports:
+      - 27017:27017
