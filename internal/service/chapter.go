@@ -54,6 +54,7 @@ func (s *MangaService) UploadChapter(ctx context.Context, chapterDTO domain.Uplo
 	}
 
 	err = s.storage.UploadChapter(ctx, domain.Chapter{
+		Title:       chapterDTO.Title,
 		Volume:      chapterDTO.Volume,
 		Number:      chapterDTO.Number,
 		PageCount:   pageCount,

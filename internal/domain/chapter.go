@@ -9,6 +9,7 @@ type Chapter struct {
 	Volume      int    `json:"volume" bson:"volume"`
 	Number      int    `json:"number" bson:"number"`
 	PageCount   int    `json:"pageCount" bson:"pageCount"`
+	Title       string `json:"title" bson:"title"`
 	MangaSlug   string `json:"-" bson:"-"`
 	UploaderId  string `json:"uploaderId" bson:"uploaderId"`
 	IsPublished bool   `json:"isPublished" bson:"isPublished"`
@@ -17,6 +18,7 @@ type Chapter struct {
 }
 
 type UploadChapterDTO struct {
+	Title      string                `form:"title" binding:"required"`
 	MangaSlug  string                `form:"mangaSlug" binding:"required"`
 	UploaderID string                `form:"-" swaggerignore:"true"`
 	Volume     int                   `form:"volume" binding:"required,numeric,gte=0"`
