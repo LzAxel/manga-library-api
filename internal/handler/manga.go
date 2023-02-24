@@ -67,6 +67,11 @@ func (h *Handler) getLatestManga(c *gin.Context) {
 		return
 	}
 
+	if len(result) == 0 {
+		ErrorResponse(c, http.StatusNotFound, domain.ErrNotFound.Error())
+		return
+	}
+
 	c.JSON(http.StatusOK, result)
 }
 
@@ -171,7 +176,7 @@ func (h *Handler) getMangaByFilter(c *gin.Context) {
 		ErrorResponse(c, http.StatusInternalServerError, "failed to getting manga by filter")
 		return
 	}
-	if manga == nil {
+	if len(manga) == 0 {
 		ErrorResponse(c, http.StatusNotFound, domain.ErrNotFound.Error())
 		return
 	}

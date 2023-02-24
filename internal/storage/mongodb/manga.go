@@ -65,6 +65,9 @@ func (m *MangaMongoDB) GetById(ctx context.Context, mangaId string) (domain.Mang
 
 	cur := coll.FindOne(ctx, bson.M{"_id": mangaId})
 	cur.Decode(&manga)
+	if errors.Is(cur.Err(), mongo.ErrNoDocuments) {
+		return manga, domain.ErrNotFound
+	}
 
 	return manga, cur.Err()
 }
@@ -76,6 +79,9 @@ func (m *MangaMongoDB) GetBySlug(ctx context.Context, mangaSlug string) (domain.
 
 	cur := coll.FindOne(ctx, bson.M{"slug": mangaSlug})
 	cur.Decode(&manga)
+	if errors.Is(cur.Err(), mongo.ErrNoDocuments) {
+		return manga, domain.ErrNotFound
+	}
 
 	return manga, cur.Err()
 }
