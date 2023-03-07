@@ -39,18 +39,17 @@ type Service struct {
 	logger     logger.Logger
 	storages   *storage.Storage
 	JWTMangaer *jwt.JWTManager
-	adminUser  domain.AdminUser
 }
 
 func NewService(storage *storage.Storage, JWTManager *jwt.JWTManager,
-	logger logger.Logger, adminUser domain.AdminUser) *Service {
+	logger logger.Logger) *Service {
 
 	return &Service{
 		storages:      storage,
 		JWTMangaer:    JWTManager,
 		logger:        logger,
 		Manga:         NewMangaService(storage.Manga, logger),
-		Authorization: NewAuthorizationService(storage.Authorization, logger, JWTManager, adminUser),
+		Authorization: NewAuthorizationService(storage.Authorization, logger, JWTManager),
 		User:          NewUserService(storage.User, logger),
 	}
 }

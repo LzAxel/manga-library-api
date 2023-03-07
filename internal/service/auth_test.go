@@ -19,13 +19,12 @@ import (
 
 func TestAuth_SignUp(t *testing.T) {
 	var (
-		l      = logger.NewLogrusLogger("info", false, false)
-		jwt    = jwt.NewJWTManager("secret", int(time.Hour)*12)
-		admUsr = domain.AdminUser{Username: "admin", Password: "admin"}
-		ctrl   = gomock.NewController(t)
-		stor   = mock_storage.NewMockAuthorization(ctrl)
-		svc    = service.NewAuthorizationService(stor, l, jwt, admUsr)
-		ctx    = context.Background()
+		l    = logger.NewLogrusLogger("info", false, false)
+		jwt  = jwt.NewJWTManager("secret", int(time.Hour)*12)
+		ctrl = gomock.NewController(t)
+		stor = mock_storage.NewMockAuthorization(ctrl)
+		svc  = service.NewAuthorizationService(stor, l, jwt)
+		ctx  = context.Background()
 	)
 
 	t.Run("sing up existed user", func(t *testing.T) {
@@ -55,12 +54,11 @@ func TestAuth_SignIn(t *testing.T) {
 	var (
 		l            = logger.NewLogrusLogger("info", false, false)
 		jwt          = jwt.NewJWTManager("secret", int(time.Hour)*12)
-		admUsr       = domain.AdminUser{Username: "admin", Password: "admin"}
 		ctrl         = gomock.NewController(t)
 		stor         = mock_storage.NewMockAuthorization(ctrl)
 		salt         = hash.GenerateSalt()
 		passwordHash = hash.HashPassword(salt, "password")
-		svc          = service.NewAuthorizationService(stor, l, jwt, admUsr)
+		svc          = service.NewAuthorizationService(stor, l, jwt)
 		ctx          = context.Background()
 	)
 
@@ -74,16 +72,6 @@ func TestAuth_SignIn(t *testing.T) {
 	}
 
 	testCases := []testCase{
-		{
-			name: "login admin user",
-			data: domain.LoginUserDTO{
-				Username: admUsr.Username,
-				Password: admUsr.Password,
-			},
-			prepare:   nil,
-			expErr:    nil,
-			expReturn: true,
-		},
 		{
 			name: "login unexisted user",
 			data: domain.LoginUserDTO{

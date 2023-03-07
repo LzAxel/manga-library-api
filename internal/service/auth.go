@@ -17,15 +17,13 @@ type AuthorizationService struct {
 	storage    storage.Authorization
 	logger     logger.Logger
 	jwtManager *jwt.JWTManager
-	adminUser  domain.AdminUser
 }
 
-func NewAuthorizationService(storage storage.Authorization, logger logger.Logger, jwtManager *jwt.JWTManager, adminUser domain.AdminUser) *AuthorizationService {
+func NewAuthorizationService(storage storage.Authorization, logger logger.Logger, jwtManager *jwt.JWTManager) *AuthorizationService {
 	return &AuthorizationService{
 		storage:    storage,
 		logger:     logger,
 		jwtManager: jwtManager,
-		adminUser:  adminUser,
 	}
 }
 
@@ -52,13 +50,6 @@ func (s *AuthorizationService) SignUp(ctx context.Context, userDTO domain.Create
 }
 
 func (s *AuthorizationService) SignIn(ctx context.Context, userDTO domain.LoginUserDTO) (string, error) {
-	if userDTO == domain.LoginUserDTO(s.adminUser) {
-		// TODO fix admin id
-		token := s.jwtManager.NewJWT("admin-user-id")
-
-		return token, nil
-	}
-
 	hashedPassword, userId, err := s.storage.SignIn(ctx, userDTO.Username)
 	if err != nil {
 		return "", domain.ErrWrongAuthCreditionals

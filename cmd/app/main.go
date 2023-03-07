@@ -2,7 +2,6 @@ package main
 
 import (
 	"manga-library/internal/config"
-	"manga-library/internal/domain"
 	"manga-library/internal/handler"
 	"manga-library/internal/service"
 	"manga-library/internal/storage"
@@ -15,13 +14,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const configPath = "configs/config.yaml"
+const configPath = "./configs/config.yaml"
 
 // @Title Manga Library API
 // @Version 1.0
 // @Description API Server for Manga Library App
 
-// @Host localhost:8080
+// @Host localhost:80
 // @BasePath /
 
 // @SecurityDefinitions.apikey BearerAuth
@@ -34,11 +33,6 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	adminUser := domain.AdminUser{
-		Username: cfg.AppConfig.AdminUser.Login,
-		Password: cfg.AppConfig.AdminUser.Password,
-	}
-
 	l := logger.NewLogrusLogger(cfg.AppConfig.LogLevel, cfg.IsDebug, cfg.IsProd)
 	l.Infoln("logger initializated")
 
@@ -47,7 +41,7 @@ func main() {
 
 	jwtManager := jwt.NewJWTManager(cfg.JWT.Secret, cfg.JWT.TokenTTL)
 	storage := storage.NewStorage(mongodb, l)
-	service := service.NewService(storage, jwtManager, l, adminUser)
+	service := service.NewService(storage, jwtManager, l)
 	handler := handler.NewHandler(service, l)
 
 	handlers := handler.InitRoutes()
